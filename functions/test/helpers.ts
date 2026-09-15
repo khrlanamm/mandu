@@ -1,7 +1,7 @@
 import {getApps, initializeApp} from "firebase-admin/app";
 import {getAuth} from "firebase-admin/auth";
-import {getFirestore} from "firebase-admin/firestore";
-import {readClaims, type Caller, type ManduClaims} from "../src/core/claims";
+import {getFirestore, Timestamp} from "firebase-admin/firestore";
+import {readClaims, type Caller, type ManduClaims, type SchoolRole} from "../src/core/claims";
 
 const PROJECT_ID = "demo-mandu";
 const firestoreHost = process.env.FIRESTORE_EMULATOR_HOST;
@@ -40,5 +40,37 @@ export function createUser(uid: string, email: string, options: {emailVerified?:
     password: "rahasia-123",
     emailVerified: options.emailVerified ?? true,
     displayName: options.displayName ?? uid,
+  });
+}
+
+/** Tambah anggota aktif langsung ke Firestore dan kembalikan Caller dengan claims yang sesuai. */
+export async function addMember(
+  schoolId: string,
+  uid: string,
+  data: {displayName: string; role: SchoolRole; units?: string[]; canVerify?: boolean; kelas?: string},
+): Promise<Caller> {
+  const now = Timestamp.now();
+  await db.doc(`schools/${schoolId}/members/${uid}`).set({
+    uid,
+    displayName: data.displayName,
+    email: `${uid}@contoh.sch.id`,
+    role: data.role,
+    units: data.units ?? [],
+    canVerify: data.canVerify ?? false,
+    status: "active",
+    joinedVia: "invite",
+    kelas: data.kelas ?? null,
+    nisn: null,
+    reviewedBy: null,
+    reviewedAt: null,
+    rejectionReason: null,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return asCaller(uid, {
+    sid: schoolId,
+    role: data.role,
+    units: data.units ?? [],
+    canVerify: data.role === "admin" || (data.canVerify ?? false),
   });
 }

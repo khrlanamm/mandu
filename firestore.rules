@@ -39,6 +39,16 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/schools/$(schoolId)/ticketOwners/$(ticketId)).data.uid == request.auth.uid;
     }
 
+    // Pengirim aspirasi (siswa yang masuk) untuk melacak aspirasinya sendiri.
+    function ownsAspiration(schoolId, aspirationId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/schools/$(schoolId)/aspirationOwners/$(aspirationId)).data.uid == request.auth.uid;
+    }
+
+    function readsAspirationInbox(schoolId) {
+      return hasRole(schoolId, ['admin', 'pimpinan']) || canVerify(schoolId);
+    }
+
     // ===================== MANDU 2.0 =====================
 
     // Konfigurasi platform (kontak darurat, katalog kategori).
@@ -102,6 +112,31 @@ service cloud.firestore {
             || (resource.data.visibility == 'public' && ownsTicket(schoolId, ticketId));
           allow write: if false;
         }
+      }
+
+      // Aspirasi tanpa identitas pengirim: staf pengelola, siswa (hanya yang tampil di papan), atau pengirimnya.
+      match /aspirations/{aspirationId} {
+        allow read: if readsAspirationInbox(schoolId)
+          || (hasRole(schoolId, ['siswa']) && resource.data.board == 'published')
+          || ownsAspiration(schoolId, aspirationId);
+        allow write: if false;
+
+        // Nama & kelas pengirim yang tidak merahasiakan identitas.
+        match /private/{docId} {
+          allow read: if readsAspirationInbox(schoolId);
+          allow write: if false;
+        }
+
+        // Dukungan papan aspirasi: siswa hanya melihat dukungannya sendiri.
+        match /supports/{uid} {
+          allow read: if inSchool(schoolId) && request.auth.uid == uid;
+          allow write: if false;
+        }
+      }
+
+      match /aspirationOwners/{aspirationId} {
+        allow read: if signedIn() && resource.data.uid == request.auth.uid;
+        allow write: if false;
       }
 
       // Pemetaan laporan → pelapor, hanya bisa dibaca pelapor sendiri.

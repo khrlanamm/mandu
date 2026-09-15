@@ -2,6 +2,8 @@ import {setGlobalOptions} from "firebase-functions/v2";
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {acceptConsent, changeInitialPassword, updateDisplayName} from "./accounts/profile";
 import {syncAccount} from "./accounts/sync";
+import {reviewAspiration, supportAspiration} from "./aspirations/review";
+import {optionalCaller, submitAspiration, submitPublicAspiration} from "./aspirations/submit";
 import {callable} from "./core/callable";
 import {requireAuth, requireSuperadmin} from "./core/claims";
 import {inviteStaff, revokeInvitation} from "./members/invite";
@@ -76,6 +78,16 @@ export const tickets = {
   resolve: callable("tickets-resolve", (request) => resolveTicket(requireAuth(request), request.data)),
   reassign: callable("tickets-reassign", (request) => reassignTicket(requireAuth(request), request.data)),
   rate: callable("tickets-rate", (request) => rateTicket(requireAuth(request), request.data)),
+};
+
+/** Aspirasi siswa & tamu: `aspirations-submit`, `aspirations-submitPublic`, ... */
+export const aspirations = {
+  submit: callable("aspirations-submit", (request) => submitAspiration(requireAuth(request), request.data)),
+  // Tanpa login (tamu lewat kode/QR sekolah); dibatasi per IP dan per akun anonim.
+  submitPublic: callable("aspirations-submitPublic", (request) =>
+    submitPublicAspiration(optionalCaller(request), request.data, request.rawRequest.ip)),
+  review: callable("aspirations-review", (request) => reviewAspiration(requireAuth(request), request.data)),
+  support: callable("aspirations-support", (request) => supportAspiration(requireAuth(request), request.data)),
 };
 
 /** Pengingat laporan yang melewati batas waktu verifikasi/tindak lanjut. */

@@ -1,8 +1,7 @@
-import {SUPERADMIN, asCaller, db, resetEmulators} from "./helpers";
+import {SUPERADMIN, addMember, db, resetEmulators} from "./helpers";
 import {Timestamp} from "firebase-admin/firestore";
 import {getStorage} from "firebase-admin/storage";
 import {beforeEach, describe, expect, it} from "vitest";
-import type {ManduClaims, SchoolRole} from "../src/core/claims";
 import {createSchool, updateSchool} from "../src/schools/manage";
 import {runSlaReminders} from "../src/tickets/reminders";
 import {submitTicket} from "../src/tickets/submit";
@@ -15,38 +14,6 @@ import {
   supplyTicketInfo,
   verifyTicket,
 } from "../src/tickets/workflow";
-
-async function addMember(
-  schoolId: string,
-  uid: string,
-  data: {displayName: string; role: SchoolRole; units?: string[]; canVerify?: boolean; kelas?: string},
-) {
-  const now = Timestamp.now();
-  await db.doc(`schools/${schoolId}/members/${uid}`).set({
-    uid,
-    displayName: data.displayName,
-    email: `${uid}@contoh.sch.id`,
-    role: data.role,
-    units: data.units ?? [],
-    canVerify: data.canVerify ?? false,
-    status: "active",
-    joinedVia: "invite",
-    kelas: data.kelas ?? null,
-    nisn: null,
-    reviewedBy: null,
-    reviewedAt: null,
-    rejectionReason: null,
-    createdAt: now,
-    updatedAt: now,
-  });
-  const claims: ManduClaims = {
-    sid: schoolId,
-    role: data.role,
-    units: data.units ?? [],
-    canVerify: data.role === "admin" || (data.canVerify ?? false),
-  };
-  return asCaller(uid, claims);
-}
 
 async function setupSchool() {
   const {schoolId} = await createSchool(SUPERADMIN, {
