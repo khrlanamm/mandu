@@ -76,8 +76,19 @@ Sekolah demo: **SMA Negeri Demo MANDU**, kode gabung `DEMO01`.
 - Artikel global (superadmin) dan artikel sekolah (admin/konselor): artikel Markdown, tautan, dan info beasiswa dengan tenggat.
 - Pencarian, filter kategori, konten unggulan, tersimpan (bookmark), hitungan dibaca.
 
+### Tahap 6 — Dashboard
+- Agregasi statistik sekolah: status & kategori laporan, tren bulanan, kinerja tiap unit (rata-rata waktu dan % tepat waktu), kepuasan pelapor, lokasi teratas, ringkasan aspirasi/BK/anggota.
+- Dashboard Flutter dengan grafik (fl_chart), pilihan periode 3/6/12 bulan, dan ekspor CSV.
+- Dashboard platform superadmin: jumlah sekolah, anggota, laporan, dan aspirasi per sekolah (tanpa isi).
+
+### Manual penggunaan
+- Naskah: `docs/manual/manual-mandu.html` (18 bab: siswa, Tim Verifikasi, petugas unit, guru BK, admin, pimpinan, superadmin, tamu, privasi, FAQ).
+- Tangkapan layar: `docs/manual/img/` (diambil dari emulator Android memakai akun uji coba).
+- Buat PDF: `docs/manual/render.sh` → `docs/manual/manual-mandu.pdf`.
+
 ## Sedang dikerjakan
-- **Tahap 6 — Dashboard & web:** agregasi statistik sekolah dan platform (`functions/src/stats/compute.ts`) sudah ditulis; berikutnya layar dashboard (fl_chart), ekspor CSV, dan deploy web ke Firebase Hosting.
+- Melengkapi tangkapan layar manual untuk peran staf, konselor, dan superadmin, lalu merender PDF final.
+- Dashboard web: `flutterfire configure` platform web dan deploy ke Firebase Hosting `teman-ngadu.web.app`.
 
 ## Berikutnya
 - **Manual book PDF** penggunaan aplikasi + dashboard memakai akun uji coba.
