@@ -17,6 +17,14 @@ import '../../auth/application/session_controller.dart';
 import '../data/stats_repository.dart';
 import '../domain/school_stats.dart';
 
+/// Format durasi rata-rata: di bawah 1 jam ditulis "<1 jam" agar tidak tampil "0.0 jam".
+String formatHours(double? hours) {
+  if (hours == null) return '-';
+  if (hours < 1) return '<1 jam';
+  if (hours < 48) return '${hours.toStringAsFixed(hours < 10 ? 1 : 0)} jam';
+  return '${(hours / 24).toStringAsFixed(1)} hari';
+}
+
 /// Dashboard sekolah untuk admin, pimpinan, dan Tim Verifikasi.
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -38,6 +46,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ['Ringkasan', 'Lewat batas waktu', '${stats.tickets.overdue}'],
       ['Ringkasan', 'Rata-rata verifikasi (jam)', '${stats.tickets.avgVerifyHours ?? '-'}'],
       ['Ringkasan', 'Rata-rata penyelesaian (jam)', '${stats.tickets.avgResolveHours ?? '-'}'],
+      ['Ringkasan', 'Jumlah penilaian', '${stats.tickets.ratingCount}'],
       ['Ringkasan', 'Rata-rata kepuasan', '${stats.tickets.avgRating ?? '-'}'],
       for (final entry in stats.tickets.byCategory.entries)
         ['Kategori', kCategoryLabels[entry.key] ?? entry.key, '${entry.value}'],
@@ -173,14 +182,14 @@ class _StatsBody extends StatelessWidget {
                       Expanded(
                         child: _Metric(
                           title: 'Rata-rata verifikasi',
-                          value: tickets.avgVerifyHours == null ? '-' : '${tickets.avgVerifyHours} jam',
+                          value: formatHours(tickets.avgVerifyHours),
                           hint: 'dari laporan masuk',
                         ),
                       ),
                       Expanded(
                         child: _Metric(
                           title: 'Rata-rata selesai',
-                          value: tickets.avgResolveHours == null ? '-' : '${tickets.avgResolveHours} jam',
+                          value: formatHours(tickets.avgResolveHours),
                           hint: 'sampai ditindaklanjuti',
                         ),
                       ),
@@ -220,7 +229,7 @@ class _StatsBody extends StatelessWidget {
                           title: Text(unit.unitName),
                           subtitle: Text(
                             '${unit.selesai} dari ${unit.total} selesai'
-                            '${unit.avgResolveHours == null ? '' : ' · rata-rata ${unit.avgResolveHours} jam'}',
+                            '${unit.avgResolveHours == null ? '' : ' · rata-rata ${formatHours(unit.avgResolveHours)}'}',
                           ),
                           trailing: unit.onTimePercent == null
                               ? null
