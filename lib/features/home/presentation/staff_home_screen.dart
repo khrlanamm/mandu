@@ -9,6 +9,8 @@ import '../../../core/design/widgets/layout.dart';
 import '../../../core/design/widgets/mandu_logo.dart';
 import '../../../core/design/widgets/states.dart';
 import '../../../core/domain/roles.dart';
+import '../../aspirasi/data/aspiration_repository.dart';
+import '../../aspirasi/domain/aspiration.dart';
 import '../../auth/application/session_controller.dart';
 import '../../lapor/data/ticket_repository.dart';
 import '../../lapor/domain/ticket.dart';
@@ -32,6 +34,9 @@ class StaffHomeScreen extends ConsumerWidget {
     final access = ref.watch(staffTicketAccessProvider);
     final tickets = ref.watch(staffTicketsProvider).value;
     final palette = context.palette;
+    final newAspirations = (access?.seesAll ?? false)
+        ? ref.watch(aspirationInboxProvider(account.schoolId!)).value?.where((item) => item.status == AspirationStatus.diterima).length
+        : null;
 
     int count(bool Function(Ticket ticket) test) => tickets?.where(test).length ?? 0;
 
@@ -116,6 +121,22 @@ class StaffHomeScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
+                  if (access?.seesAll ?? false) ...[
+                    const SizedBox(height: Gaps.xl),
+                    const SectionHeader(title: 'Aspirasi'),
+                    const SizedBox(height: Gaps.md),
+                    _ActionTile(
+                      icon: Icons.lightbulb_rounded,
+                      tone: palette.aspirasi,
+                      title: 'Aspirasi masuk',
+                      subtitle: newAspirations == null
+                          ? 'Memuat...'
+                          : newAspirations == 0
+                              ? 'Semua aspirasi sudah ditinjau'
+                              : '$newAspirations aspirasi baru belum ditinjau',
+                      onTap: () => context.push(Routes.staffAspirations),
+                    ),
+                  ],
                   if (isAdmin) ...[
                     const SizedBox(height: Gaps.xl),
                     const SectionHeader(title: 'Kelola sekolah'),

@@ -98,6 +98,7 @@ class _NotificationTile extends StatelessWidget {
         : switch (notification.type) {
             'tiket_baru' || 'tiket_unit' => palette.lapor,
             'tiket_pengingat' => palette.warning,
+            'aspirasi_baru' || 'aspirasi_ditanggapi' => palette.aspirasi,
             _ => palette.info,
           };
     final icon = notification.urgent
@@ -107,6 +108,8 @@ class _NotificationTile extends StatelessWidget {
             'tiket_unit' => Icons.assignment_ind_rounded,
             'tiket_pengingat' => Icons.alarm_rounded,
             'tiket_dilengkapi' => Icons.edit_note_rounded,
+            'aspirasi_baru' => Icons.lightbulb_rounded,
+            'aspirasi_ditanggapi' => Icons.forum_rounded,
             _ => Icons.update_rounded,
           };
 

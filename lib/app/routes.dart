@@ -17,6 +17,11 @@ abstract final class Routes {
   static const studentNotifications = '/home/notifikasi';
   static const studentAccount = '/home/akun';
   static const studentReport = '/home/lapor';
+  static const studentAspirations = '/home/aspirasi';
+  static const studentAspirationForm = '/home/aspirasi/baru';
+
+  static String studentAspiration(String id, {bool justSubmitted = false}) =>
+      '/home/aspirasi/$id${justSubmitted ? '?baru=1' : ''}';
 
   static String studentReportForm(String category) => '/home/lapor/$category';
 
@@ -28,6 +33,12 @@ abstract final class Routes {
   static const staffSchool = '/staff/sekolah';
   static const staffAccount = '/staff/akun';
   static const staffNotifications = '/staff/notifikasi';
+  static const staffAspirations = '/staff/aspirasi';
+
+  static String staffAspiration(String id) => '/staff/aspirasi/$id';
+
+  /// Aspirasi tanpa login lewat kode/QR sekolah (web & aplikasi).
+  static String publicAspiration(String code) => '/s/${code.toUpperCase()}/aspirasi';
 
   static String staffTicket(String ticketId) => '/staff/laporan/$ticketId';
 

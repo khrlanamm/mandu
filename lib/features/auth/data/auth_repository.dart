@@ -44,9 +44,11 @@ class AuthRepository {
   Future<void> sendPasswordReset(String email) => _auth.sendPasswordResetEmail(email: email.trim());
 
   Future<void> signOut() async {
-    if (!kIsWeb) {
+    final usedGoogle = _auth.currentUser?.providerData.any((provider) => provider.providerId == 'google.com') ?? false;
+    // Credential Manager bisa lama merespons; akun email/NISN tidak perlu membersihkannya.
+    if (!kIsWeb && usedGoogle) {
       try {
-        await GoogleSignIn.instance.signOut();
+        await GoogleSignIn.instance.signOut().timeout(const Duration(seconds: 5));
       } catch (error) {
         debugPrint('Sign out Google gagal: $error');
       }

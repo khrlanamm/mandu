@@ -10,6 +10,7 @@ import '../../../core/design/palette.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/design/widgets/feedback.dart';
 import '../../../core/design/widgets/mandu_logo.dart';
+import '../../../core/domain/school_code.dart';
 import '../../../core/domain/service.dart';
 import '../../../core/errors.dart';
 import '../data/auth_repository.dart';
@@ -37,6 +38,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _openPublicAspiration() async {
+    final code = await showDialog<String>(context: context, builder: (context) => const _SchoolCodeDialog());
+    if (code != null && mounted) context.push(Routes.publicAspiration(code));
   }
 
   @override
@@ -96,6 +102,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                           onPressed: _busy ? null : () => context.push(Routes.emailLogin),
                           child: const Text('Staf sekolah? Masuk dengan email'),
                         ),
+                        TextButton.icon(
+                          onPressed: _busy ? null : _openPublicAspiration,
+                          icon: const Icon(Icons.lightbulb_outline_rounded),
+                          label: const Text('Kirim aspirasi tanpa login'),
+                        ),
                         const SizedBox(height: Gaps.xl),
                         Text(
                           'Setelah masuk, kamu akan diminta membaca dan menyetujui Kebijakan Privasi MANDU.',
@@ -111,6 +122,59 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SchoolCodeDialog extends StatefulWidget {
+  const _SchoolCodeDialog();
+
+  @override
+  State<_SchoolCodeDialog> createState() => _SchoolCodeDialogState();
+}
+
+class _SchoolCodeDialogState extends State<_SchoolCodeDialog> {
+  final _code = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _code.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final code = _code.text.trim().toUpperCase();
+    if (!isValidSchoolCode(code)) {
+      setState(() => _error = 'Kode sekolah terdiri dari 4–12 huruf/angka.');
+      return;
+    }
+    Navigator.pop(context, code);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Aspirasi tanpa login'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('Masukkan kode sekolah yang tertera di poster atau QR MANDU sekolahmu.'),
+          const SizedBox(height: Gaps.lg),
+          TextField(
+            controller: _code,
+            autofocus: true,
+            textCapitalization: TextCapitalization.characters,
+            onSubmitted: (_) => _submit(),
+            decoration: InputDecoration(labelText: 'Kode sekolah', errorText: _error),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+        FilledButton(onPressed: _submit, child: const Text('Lanjut')),
+      ],
     );
   }
 }

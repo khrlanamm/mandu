@@ -78,6 +78,10 @@ class SchoolRepository {
 SchoolRepository schoolRepository(Ref ref) =>
     SchoolRepository(ref.watch(functionsProvider), ref.watch(firestoreProvider));
 
+/// Informasi publik sekolah dari kode (aspirasi tanpa login).
+@riverpod
+Future<PublicSchool> publicSchool(Ref ref, String code) => ref.watch(schoolRepositoryProvider).lookup(code);
+
 @riverpod
 Stream<School?> schoolDoc(Ref ref, String schoolId) => ref.watch(schoolRepositoryProvider).watchSchool(schoolId);
 

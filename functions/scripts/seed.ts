@@ -13,6 +13,8 @@ import type {UserRecord} from "firebase-admin/auth";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import {syncClaims} from "../src/accounts/claims";
 import {ensureUserDoc} from "../src/accounts/users";
+import {reviewAspiration, supportAspiration} from "../src/aspirations/review";
+import {submitAspiration, submitPublicAspiration} from "../src/aspirations/submit";
 import {readClaims, type Caller} from "../src/core/claims";
 import {auth, db} from "../src/core/firebase";
 import {nisnEmail} from "../src/core/ids";
@@ -234,6 +236,51 @@ async function ensureSampleTickets(schoolId: string, domain: string): Promise<nu
   return 6;
 }
 
+/** Contoh aspirasi: di papan dengan tanggapan dan dukungan, sedang ditinjau, dan dari tamu. */
+async function ensureSampleAspirations(schoolId: string, code: string, domain: string): Promise<number> {
+  const existing = await db().collection("schools").doc(schoolId).collection("aspirations").limit(1).get();
+  if (!existing.empty) return 0;
+
+  const [admin, siswa, siswa2] = await Promise.all(["admin", "siswa", "siswa2"].map((name) => callerFor(`${name}@${domain}`)));
+
+  const parking = await submitAspiration(siswa, {
+    schoolId,
+    anonymous: false,
+    type: "usulan",
+    topic: "fasilitas",
+    title: "Tambah tempat parkir sepeda",
+    content: "Banyak siswa bersepeda tetapi tempat parkirnya sempit, sepeda sering ditumpuk sampai rusak. Usul area belakang kantin dipakai untuk parkir sepeda.",
+  });
+  await reviewAspiration(admin, {
+    schoolId,
+    aspirationId: parking.aspirationId,
+    status: "ditindaklanjuti",
+    board: "published",
+    response: "Terima kasih. Area belakang kantin sudah diukur dan akan dipasang rak sepeda bulan depan.",
+  });
+  await supportAspiration(siswa2, {schoolId, aspirationId: parking.aspirationId, support: true});
+  await supportAspiration(siswa, {schoolId, aspirationId: parking.aspirationId, support: true});
+
+  const club = await submitAspiration(siswa2, {
+    schoolId,
+    anonymous: true,
+    type: "ide",
+    topic: "kegiatan",
+    title: "Ekstrakurikuler podcast sekolah",
+    content: "Bagaimana kalau ada ekskul podcast untuk berbagi cerita inspiratif alumni dan kabar kegiatan sekolah?",
+  });
+  await reviewAspiration(admin, {schoolId, aspirationId: club.aspirationId, status: "ditinjau"});
+
+  await submitPublicAspiration(null, {
+    code,
+    type: "kritik",
+    topic: "layanan",
+    title: "Antrean legalisir di TU terlalu lama",
+    content: "Sebagai alumni, saya harus menunggu tiga hari untuk legalisir ijazah. Mohon ada jadwal layanan yang jelas.",
+  }, "seed-script");
+  return 3;
+}
+
 async function main(): Promise<void> {
   assertSafeTarget();
 
@@ -259,6 +306,7 @@ async function main(): Promise<void> {
   await ensureStudent(school, production ? `calon@${domain}` : "calon.siswa@mandu.test", "Rina Pratiwi", "X-1", {approve: false, consent: false});
   await ensureNisnStudent(school, "0059990001", "Dewi Lestari", "X-2");
   const sampleTickets = await ensureSampleTickets(school.id, domain);
+  const sampleAspirations = await ensureSampleAspirations(school.id, code, domain);
 
   if (!production) {
     const secondName = "SMP Harapan Bangsa";
@@ -268,6 +316,7 @@ async function main(): Promise<void> {
 
   console.log(`\nData uji coba siap (${production ? "PRODUKSI" : "emulator"}). Password: ${production ? "(sesuai --password)" : password}`);
   console.table(summary);
+  console.log(sampleAspirations ? `${sampleAspirations} contoh aspirasi dibuat.` : "Contoh aspirasi sudah ada, dilewati.");
   console.log(sampleTickets ? `${sampleTickets} contoh laporan dibuat di ${name}.` : `Contoh laporan di ${name} sudah ada, dilewati.`);
 }
 

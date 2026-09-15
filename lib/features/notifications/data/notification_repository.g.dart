@@ -96,7 +96,7 @@ final class InboxProvider
   }
 }
 
-String _$inboxHash() => r'ac753677c63c78df565611e304f0b0ff20f7a615';
+String _$inboxHash() => r'ada11dd20f0131b825b0a62b4a4009be89004812';
 
 @ProviderFor(unreadNotificationCount)
 final unreadNotificationCountProvider = UnreadNotificationCountProvider._();

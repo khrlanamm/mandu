@@ -134,8 +134,9 @@ class PushController extends _$PushController {
     _token = null;
     if (!_pushSupported || token == null) return;
     try {
-      await ref.read(notificationRepositoryProvider).unregisterDevice(token);
-      await FirebaseMessaging.instance.deleteToken();
+      // Batas waktu agar keluar akun tidak tertahan saat jaringan/Play Services lambat.
+      await ref.read(notificationRepositoryProvider).unregisterDevice(token).timeout(const Duration(seconds: 5));
+      await FirebaseMessaging.instance.deleteToken().timeout(const Duration(seconds: 5));
     } catch (error) {
       debugPrint('Lepas token notifikasi gagal: $error');
     }

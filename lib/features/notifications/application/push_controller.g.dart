@@ -44,7 +44,7 @@ final class PushControllerProvider
   }
 }
 
-String _$pushControllerHash() => r'6d7ae6dcc388bdee17d121e8189edfc5f4097429';
+String _$pushControllerHash() => r'1097c5be2b27e8d878bdd9fc301818c8a367835d';
 
 /// Mendaftarkan token FCM perangkat untuk akun yang masuk dan membuka rute saat notifikasi diketuk.
 

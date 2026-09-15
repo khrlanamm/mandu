@@ -2,6 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../features/aspirasi/presentation/aspiration_hub_screen.dart';
+import '../features/aspirasi/presentation/public_aspiration_screen.dart';
+import '../features/aspirasi/presentation/staff_aspiration_inbox_screen.dart';
+import '../features/aspirasi/presentation/staff_aspiration_screen.dart';
+import '../features/aspirasi/presentation/student_aspiration_form_screen.dart';
+import '../features/aspirasi/presentation/student_aspiration_screen.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/auth/presentation/email_login_screen.dart';
 import '../features/auth/presentation/nisn_login_screen.dart';
@@ -87,6 +93,38 @@ GoRouter router(Ref ref) {
         builder: (context, state) => StaffTicketScreen(ticketId: state.pathParameters['ticketId']!),
       ),
       GoRoute(path: Routes.staffNotifications, builder: (context, state) => const NotificationsScreen()),
+      GoRoute(
+        path: Routes.studentAspirations,
+        builder: (context, state) => const AspirationHubScreen(),
+        routes: [
+          GoRoute(path: 'baru', builder: (context, state) => const StudentAspirationFormScreen()),
+          GoRoute(
+            path: ':aspirationId',
+            builder: (context, state) => StudentAspirationScreen(
+              aspirationId: state.pathParameters['aspirationId']!,
+              justSubmitted: state.uri.queryParameters['baru'] == '1',
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Routes.staffAspirations,
+        builder: (context, state) => const StaffAspirationInboxScreen(),
+        routes: [
+          GoRoute(
+            path: ':aspirationId',
+            builder: (context, state) => StaffAspirationScreen(aspirationId: state.pathParameters['aspirationId']!),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/s/:code',
+        redirect: (context, state) => Routes.publicAspiration(state.pathParameters['code']!),
+      ),
+      GoRoute(
+        path: '/s/:code/aspirasi',
+        builder: (context, state) => PublicAspirationScreen(code: state.pathParameters['code']!.toUpperCase()),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => StudentShell(shell: shell),
         branches: [

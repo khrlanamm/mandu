@@ -55,6 +55,90 @@ final class SchoolRepositoryProvider
 
 String _$schoolRepositoryHash() => r'1635605184586faccc279ec6a003ea13107ee72d';
 
+/// Informasi publik sekolah dari kode (aspirasi tanpa login).
+
+@ProviderFor(publicSchool)
+final publicSchoolProvider = PublicSchoolFamily._();
+
+/// Informasi publik sekolah dari kode (aspirasi tanpa login).
+
+final class PublicSchoolProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<PublicSchool>,
+          PublicSchool,
+          FutureOr<PublicSchool>
+        >
+    with $FutureModifier<PublicSchool>, $FutureProvider<PublicSchool> {
+  /// Informasi publik sekolah dari kode (aspirasi tanpa login).
+  PublicSchoolProvider._({
+    required PublicSchoolFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'publicSchoolProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$publicSchoolHash();
+
+  @override
+  String toString() {
+    return r'publicSchoolProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<PublicSchool> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<PublicSchool> create(Ref ref) {
+    final argument = this.argument as String;
+    return publicSchool(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PublicSchoolProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$publicSchoolHash() => r'1b490a28fbd47b1eb96f2ed5b35f74bf57226953';
+
+/// Informasi publik sekolah dari kode (aspirasi tanpa login).
+
+final class PublicSchoolFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<PublicSchool>, String> {
+  PublicSchoolFamily._()
+    : super(
+        retry: null,
+        name: r'publicSchoolProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Informasi publik sekolah dari kode (aspirasi tanpa login).
+
+  PublicSchoolProvider call(String code) =>
+      PublicSchoolProvider._(argument: code, from: this);
+
+  @override
+  String toString() => r'publicSchoolProvider';
+}
+
 @ProviderFor(schoolDoc)
 final schoolDocProvider = SchoolDocFamily._();
 
