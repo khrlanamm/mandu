@@ -18,6 +18,8 @@ export interface NotificationInput {
   schoolId: string;
   ticketId?: string;
   urgent?: boolean;
+  /** false: hanya push, tidak disimpan di kotak notifikasi (mis. pesan curhat). */
+  inbox?: boolean;
 }
 
 const INVALID_TOKEN_CODES = new Set([
@@ -31,6 +33,16 @@ export async function notifyUsers(uids: Iterable<string>, input: NotificationInp
   const recipients = [...new Set(uids)].filter(Boolean);
   if (recipients.length === 0) return;
 
+  if (input.inbox !== false) await writeInbox(recipients, input);
+
+  try {
+    await sendPush(recipients, input);
+  } catch (error) {
+    logger.warn("Push notifikasi gagal dikirim", error);
+  }
+}
+
+async function writeInbox(recipients: string[], input: NotificationInput): Promise<void> {
   const batch = db().batch();
   const now = FieldValue.serverTimestamp();
   for (const uid of recipients) {
@@ -47,12 +59,6 @@ export async function notifyUsers(uids: Iterable<string>, input: NotificationInp
     });
   }
   await batch.commit();
-
-  try {
-    await sendPush(recipients, input);
-  } catch (error) {
-    logger.warn("Push notifikasi gagal dikirim", error);
-  }
 }
 
 async function sendPush(uids: string[], input: NotificationInput): Promise<void> {

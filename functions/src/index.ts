@@ -1,8 +1,20 @@
 import {setGlobalOptions} from "firebase-functions/v2";
+import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {acceptConsent, changeInitialPassword, updateDisplayName} from "./accounts/profile";
 import {syncAccount} from "./accounts/sync";
 import {reviewAspiration, supportAspiration} from "./aspirations/review";
+import {
+  claimConversation,
+  closeConversation,
+  listCounselors,
+  onConversationMessage,
+  proposeMeeting,
+  respondMeeting,
+  revealIdentity,
+  startConversation,
+} from "./care/conversations";
+import {cancelHelp, claimHelp, closeHelp, requestHelp} from "./care/help";
 import {optionalCaller, submitAspiration, submitPublicAspiration} from "./aspirations/submit";
 import {callable} from "./core/callable";
 import {requireAuth, requireSuperadmin} from "./core/claims";
@@ -14,6 +26,7 @@ import {importStudents, resetStudentPassword} from "./members/students";
 import {registerDevice, unregisterDevice} from "./notifications/notify";
 import {lookupSchool} from "./schools/lookup";
 import {changeSchoolCode, createSchool, updateSchool} from "./schools/manage";
+import type {MessageDoc} from "./domain/care";
 import {runSlaReminders} from "./tickets/reminders";
 import {submitTicket} from "./tickets/submit";
 import {
@@ -89,6 +102,34 @@ export const aspirations = {
   review: callable("aspirations-review", (request) => reviewAspiration(requireAuth(request), request.data)),
   support: callable("aspirations-support", (request) => supportAspiration(requireAuth(request), request.data)),
 };
+
+/** Butuh Bantuan: `help-request`, `help-claim`, ... */
+export const help = {
+  request: callable("help-request", (request) => requestHelp(requireAuth(request), request.data)),
+  claim: callable("help-claim", (request) => claimHelp(requireAuth(request), request.data)),
+  close: callable("help-close", (request) => closeHelp(requireAuth(request), request.data)),
+  cancel: callable("help-cancel", (request) => cancelHelp(requireAuth(request), request.data)),
+};
+
+/** Curhat: `curhat-start`, `curhat-claim`, ... Isi pesan ditulis langsung oleh aplikasi (security rules). */
+export const curhat = {
+  counselors: callable("curhat-counselors", (request) => listCounselors(requireAuth(request), request.data)),
+  start: callable("curhat-start", (request) => startConversation(requireAuth(request), request.data)),
+  claim: callable("curhat-claim", (request) => claimConversation(requireAuth(request), request.data)),
+  close: callable("curhat-close", (request) => closeConversation(requireAuth(request), request.data)),
+  reveal: callable("curhat-reveal", (request) => revealIdentity(requireAuth(request), request.data)),
+  proposeMeeting: callable("curhat-proposeMeeting", (request) => proposeMeeting(requireAuth(request), request.data)),
+  respondMeeting: callable("curhat-respondMeeting", (request) => respondMeeting(requireAuth(request), request.data)),
+};
+
+/** Ringkasan percakapan & notifikasi saat ada pesan baru. */
+export const curhatMessageCreated = onDocumentCreated(
+  "schools/{schoolId}/conversations/{conversationId}/messages/{messageId}",
+  async (event) => {
+    const message = event.data?.data() as MessageDoc | undefined;
+    if (message) await onConversationMessage(event.params.schoolId, event.params.conversationId, message);
+  },
+);
 
 /** Pengingat laporan yang melewati batas waktu verifikasi/tindak lanjut. */
 export const slaReminders = onSchedule({schedule: "every 60 minutes", timeZone: "Asia/Jakarta"}, async () => {
