@@ -15,6 +15,7 @@ import {
   startConversation,
 } from "./care/conversations";
 import {cancelHelp, claimHelp, closeHelp, requestHelp} from "./care/help";
+import {deleteArticle, markArticleRead, saveArticle} from "./education/articles";
 import {optionalCaller, submitAspiration, submitPublicAspiration} from "./aspirations/submit";
 import {callable} from "./core/callable";
 import {requireAuth, requireSuperadmin} from "./core/claims";
@@ -101,6 +102,13 @@ export const aspirations = {
     submitPublicAspiration(optionalCaller(request), request.data, request.rawRequest.ip)),
   review: callable("aspirations-review", (request) => reviewAspiration(requireAuth(request), request.data)),
   support: callable("aspirations-support", (request) => supportAspiration(requireAuth(request), request.data)),
+};
+
+/** Edukasi: `articles-save`, `articles-delete`, `articles-markRead`. */
+export const articles = {
+  save: callable("articles-save", (request) => saveArticle(requireAuth(request), request.data)),
+  remove: callable("articles-delete", (request) => deleteArticle(requireAuth(request), request.data)),
+  markRead: callable("articles-markRead", (request) => markArticleRead(requireAuth(request), request.data)),
 };
 
 /** Butuh Bantuan: `help-request`, `help-claim`, ... */

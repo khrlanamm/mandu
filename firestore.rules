@@ -68,10 +68,26 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
       }
 
+      // Artikel Edukasi yang disimpan pengguna.
+      match /bookmarks/{articleId} {
+        allow read, delete: if signedIn() && request.auth.uid == uid;
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['scope', 'schoolId', 'title', 'createdAt'])
+          && request.resource.data.createdAt == request.time;
+        allow update: if false;
+      }
+
       // Token FCM dikelola lewat account-registerDevice.
       match /devices/{deviceId} {
         allow read, write: if false;
       }
+    }
+
+    // Edukasi global: semua pengguna yang masuk membaca artikel terbit.
+    // Edukasi global. Artikel lama aplikasi 4.0.0 diberi field `published` saat migrasi (tahap 7).
+    match /articles/{articleId} {
+      allow read: if signedIn() && (resource.data.published == true || isSuperadmin());
+      allow write: if false;
     }
 
     // Indeks kode sekolah hanya dibaca Cloud Functions (schools-lookup).
@@ -112,6 +128,13 @@ service cloud.firestore {
             || (resource.data.visibility == 'public' && ownsTicket(schoolId, ticketId));
           allow write: if false;
         }
+      }
+
+      // Edukasi sekolah: siswa membaca yang sudah terbit; admin & konselor juga melihat draf.
+      match /articles/{articleId} {
+        allow read: if inSchool(schoolId)
+          && (resource.data.published == true || hasRole(schoolId, ['admin', 'konselor']));
+        allow write: if false;
       }
 
       // Butuh Bantuan: hanya siswa pemilik dan konselor sekolah (admin melihat angka agregat saja).
@@ -230,11 +253,6 @@ service cloud.firestore {
         && data.nomorWhatsapp is string && data.nomorWhatsapp.size() <= 20
         && (data.get('urlBukti', null) == null || data.urlBukti is string)
         && data.timestamp is timestamp;
-    }
-
-    match /articles/{articleId} {
-      allow read: if signedIn();
-      allow write: if false;
     }
 
     match /admins/{uid} {

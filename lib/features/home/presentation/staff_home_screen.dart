@@ -172,6 +172,18 @@ class StaffHomeScreen extends ConsumerWidget {
                       onTap: () => context.push(Routes.staffAspirations),
                     ),
                   ],
+                  if (isAdmin || isCounselor) ...[
+                    const SizedBox(height: Gaps.xl),
+                    const SectionHeader(title: 'Edukasi'),
+                    const SizedBox(height: Gaps.md),
+                    _ActionTile(
+                      icon: Icons.menu_book_rounded,
+                      tone: palette.edukasi,
+                      title: 'Konten Edukasi sekolah',
+                      subtitle: 'Tulis panduan, pengumuman, dan info beasiswa',
+                      onTap: () => context.push(Routes.staffEducation),
+                    ),
+                  ],
                   if (isAdmin) ...[
                     const SizedBox(height: Gaps.xl),
                     const SectionHeader(title: 'Kelola sekolah'),

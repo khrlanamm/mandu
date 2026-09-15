@@ -17,6 +17,12 @@ abstract final class Routes {
   static const studentNotifications = '/home/notifikasi';
   static const studentAccount = '/home/akun';
   static const studentReport = '/home/lapor';
+  static const studentEducation = '/home/edukasi';
+  static const studentBookmarks = '/home/edukasi/tersimpan';
+
+  static String studentArticleById(String articleId, {String? schoolId}) =>
+      '/home/edukasi/$articleId${schoolId == null ? '' : '?sekolah=$schoolId'}';
+
   static const studentHelp = '/home/bantuan';
   static const studentHelpForm = '/home/bantuan/baru';
   static const studentCurhat = '/home/curhat';
@@ -46,6 +52,10 @@ abstract final class Routes {
 
   /// Ruang kerja konselor (Butuh Bantuan + Curhat).
   static const staffCare = '/staff/bk';
+  static const staffEducation = '/staff/edukasi';
+  static const staffArticleNew = '/staff/edukasi/tulis';
+
+  static String staffArticleEdit(String articleId) => '/staff/edukasi/tulis?id=$articleId';
 
   static String staffHelpDetail(String requestId) => '/staff/bantuan/$requestId';
 
@@ -63,4 +73,9 @@ abstract final class Routes {
   static const superadminAccount = '/superadmin/akun';
 
   static String superadminSchool(String schoolId) => '/superadmin/sekolah/$schoolId';
+
+  static const superadminEducation = '/superadmin/edukasi';
+  static const superadminArticleNew = '/superadmin/edukasi/tulis';
+
+  static String superadminArticleEdit(String articleId) => '/superadmin/edukasi/tulis?id=$articleId';
 }

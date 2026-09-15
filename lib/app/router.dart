@@ -4,6 +4,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/aspirasi/presentation/aspiration_hub_screen.dart';
 import '../features/care/presentation/conversation_screen.dart';
+import '../features/edukasi/presentation/article_admin_screen.dart';
+import '../features/edukasi/presentation/article_editor_screen.dart';
+import '../features/edukasi/presentation/article_screen.dart';
+import '../features/edukasi/presentation/education_screen.dart';
 import '../features/care/presentation/counselor_workspace_screen.dart';
 import '../features/care/presentation/curhat_list_screen.dart';
 import '../features/care/presentation/help_form_screen.dart';
@@ -101,6 +105,40 @@ GoRouter router(Ref ref) {
         builder: (context, state) => StaffTicketScreen(ticketId: state.pathParameters['ticketId']!),
       ),
       GoRoute(path: Routes.staffNotifications, builder: (context, state) => const NotificationsScreen()),
+      GoRoute(
+        path: Routes.studentEducation,
+        builder: (context, state) => const EducationScreen(),
+        routes: [
+          GoRoute(path: 'tersimpan', builder: (context, state) => const BookmarksScreen()),
+          GoRoute(
+            path: ':articleId',
+            builder: (context, state) => ArticleScreen(
+              articleId: state.pathParameters['articleId']!,
+              schoolId: state.uri.queryParameters['sekolah'],
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Routes.staffEducation,
+        builder: (context, state) => const ArticleAdminScreen(global: false),
+        routes: [
+          GoRoute(
+            path: 'tulis',
+            builder: (context, state) => ArticleEditorScreen(global: false, articleId: state.uri.queryParameters['id']),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Routes.superadminEducation,
+        builder: (context, state) => const ArticleAdminScreen(global: true),
+        routes: [
+          GoRoute(
+            path: 'tulis',
+            builder: (context, state) => ArticleEditorScreen(global: true, articleId: state.uri.queryParameters['id']),
+          ),
+        ],
+      ),
       GoRoute(
         path: Routes.studentHelp,
         builder: (context, state) => const HelpHubScreen(),

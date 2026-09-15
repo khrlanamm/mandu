@@ -15,6 +15,7 @@ import {syncClaims} from "../src/accounts/claims";
 import {ensureUserDoc} from "../src/accounts/users";
 import {claimConversation, startConversation} from "../src/care/conversations";
 import {claimHelp, requestHelp} from "../src/care/help";
+import {saveArticle} from "../src/education/articles";
 import {reviewAspiration, supportAspiration} from "../src/aspirations/review";
 import {submitAspiration, submitPublicAspiration} from "../src/aspirations/submit";
 import {readClaims, type Caller} from "../src/core/claims";
@@ -322,6 +323,77 @@ async function ensureSampleCare(schoolId: string, domain: string): Promise<numbe
   return 3;
 }
 
+/** Contoh konten Edukasi: artikel global MANDU dan artikel sekolah. */
+async function ensureSampleArticles(schoolId: string, domain: string): Promise<number> {
+  const existing = await db().collection("articles").limit(1).get();
+  if (!existing.empty) return 0;
+
+  await saveArticle(system, {
+    title: "Mengenali tanda perundungan pada diri dan teman",
+    category: "anti_bullying",
+    type: "artikel",
+    summary: "Perundungan tidak selalu terlihat. Kenali tandanya dan tahu apa yang bisa kamu lakukan.",
+    body: [
+      "Perundungan bukan sekadar bercanda. Ia berulang, menyakitkan, dan membuat korban merasa tidak berdaya.",
+      "",
+      "## Tanda yang perlu diperhatikan",
+      "- Menghindari sekolah atau kegiatan tertentu",
+      "- Barang sering hilang atau rusak",
+      "- Menjadi pendiam, mudah marah, atau sulit tidur",
+      "",
+      "## Yang bisa kamu lakukan",
+      "1. Ceritakan kepada orang dewasa yang kamu percaya.",
+      "2. Simpan bukti bila perundungan terjadi di grup atau media sosial.",
+      "3. Kirim laporan lewat menu **Lapor** di MANDU. Identitasmu bisa dirahasiakan.",
+    ].join("\n"),
+    featured: true,
+  });
+
+  await saveArticle(system, {
+    title: "Cara meminta bantuan saat merasa kewalahan",
+    category: "cari_bantuan",
+    type: "artikel",
+    summary: "Meminta bantuan bukan tanda lemah. Ini langkah sederhana untuk memulainya.",
+    body: [
+      "Kalau kamu merasa cemas, sedih, atau kewalahan, kamu tidak perlu menghadapinya sendirian.",
+      "",
+      "1. Pakai menu **Butuh Bantuan** di MANDU; kamu tidak perlu menjelaskan panjang lebar.",
+      "2. Pilih cara dihubungi yang paling nyaman: chat, bertemu, atau WhatsApp.",
+      "3. Bila keadaan mendesak, hubungi 112 atau temui guru terdekat.",
+    ].join("\n"),
+  });
+
+  await saveArticle(system, {
+    title: "Beasiswa Indonesia Maju jenjang SMA/SMK",
+    category: "beasiswa",
+    type: "beasiswa",
+    summary: "Beasiswa persiapan kuliah untuk siswa berprestasi jenjang SMA/SMK sederajat.",
+    scholarship: {
+      organizer: "Puslapdik Kemendikdasmen",
+      level: "SMA/SMK sederajat",
+      deadline: `${new Date().getFullYear()}-12-15`,
+      url: "https://beasiswa.kemdikbud.go.id",
+    },
+  });
+
+  const admin = await callerFor(`admin@${domain}`);
+  await saveArticle(admin, {
+    schoolId,
+    title: "Jadwal layanan BK dan cara membuat janji",
+    category: "layanan_bk",
+    type: "artikel",
+    summary: "Guru BK siap menemanimu. Ini jadwal layanan dan cara membuat janji temu.",
+    body: [
+      "Ruang BK buka setiap hari sekolah pukul 07.00-15.00 WIB.",
+      "",
+      "- Jam istirahat: layanan tanpa janji (datang langsung).",
+      "- Di luar jam istirahat: buat janji lewat menu **Butuh Bantuan** di MANDU.",
+      "- Ingin cerita dulu tanpa bertemu? Gunakan menu **Curhat**, boleh memakai nama samaran.",
+    ].join("\n"),
+  });
+  return 4;
+}
+
 async function main(): Promise<void> {
   assertSafeTarget();
 
@@ -349,6 +421,7 @@ async function main(): Promise<void> {
   const sampleTickets = await ensureSampleTickets(school.id, domain);
   const sampleAspirations = await ensureSampleAspirations(school.id, code, domain);
   const sampleCare = await ensureSampleCare(school.id, domain);
+  const sampleArticles = await ensureSampleArticles(school.id, domain);
 
   if (!production) {
     const secondName = "SMP Harapan Bangsa";
@@ -358,6 +431,7 @@ async function main(): Promise<void> {
 
   console.log(`\nData uji coba siap (${production ? "PRODUKSI" : "emulator"}). Password: ${production ? "(sesuai --password)" : password}`);
   console.table(summary);
+  console.log(sampleArticles ? `${sampleArticles} contoh konten Edukasi dibuat.` : "Contoh Edukasi sudah ada, dilewati.");
   console.log(sampleCare ? `${sampleCare} contoh permintaan bantuan & curhat dibuat.` : "Contoh bantuan & curhat sudah ada, dilewati.");
   console.log(sampleAspirations ? `${sampleAspirations} contoh aspirasi dibuat.` : "Contoh aspirasi sudah ada, dilewati.");
   console.log(sampleTickets ? `${sampleTickets} contoh laporan dibuat di ${name}.` : `Contoh laporan di ${name} sudah ada, dilewati.`);

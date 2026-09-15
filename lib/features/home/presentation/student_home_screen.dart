@@ -6,7 +6,6 @@ import '../../../app/routes.dart';
 
 import '../../../core/design/palette.dart';
 import '../../../core/design/tokens.dart';
-import '../../../core/design/widgets/feedback.dart';
 import '../../../core/design/widgets/layout.dart';
 import '../../../core/design/widgets/mandu_logo.dart';
 import '../../../core/design/widgets/states.dart';
@@ -37,8 +36,8 @@ class StudentHomeScreen extends ConsumerWidget {
         context.push(Routes.studentCurhat);
       case ManduService.bantuan:
         context.push(Routes.studentHelp);
-      default:
-        showSnack(context, 'Layanan ${service.label} sedang disiapkan.');
+      case ManduService.edukasi:
+        context.push(Routes.studentEducation);
     }
   }
 

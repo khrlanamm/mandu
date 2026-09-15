@@ -74,7 +74,9 @@ beforeEach(async () => {
       setDoc(doc(db, "reports/alice1"), legacyReport("alice", "terlapor")),
       setDoc(doc(db, "reports/alice2"), legacyReport("alice", "ditangani")),
       setDoc(doc(db, "reports/bob1"), legacyReport("bob", "terlapor")),
-      setDoc(doc(db, "articles/a1"), {id: 1, title: "Artikel"}),
+      // Migrasi tahap 7 menambahkan `published` pada 50 artikel lama; tanpa field itu artikel tidak terbaca.
+      setDoc(doc(db, "articles/a1"), {id: 1, title: "Artikel", published: true}),
+      setDoc(doc(db, "articles/belum-migrasi"), {id: 2, title: "Artikel lama"}),
     ]);
   });
 });
@@ -146,5 +148,6 @@ describe("rules aplikasi 4.0.0 (legacy)", () => {
     await assertFails(setDoc(doc(firestoreAs("alice"), "admins/alice"), {fcmToken: "x"}));
     await assertSucceeds(getDoc(doc(firestoreAs("alice"), "articles/a1")));
     await assertFails(getDoc(doc(guest(), "articles/a1")));
+    await assertFails(getDoc(doc(firestoreAs("alice"), "articles/belum-migrasi")));
   });
 });
