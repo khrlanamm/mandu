@@ -3,8 +3,12 @@
     "module": "node16",
     "moduleResolution": "node16",
     "target": "es2023",
-    "lib": ["es2023"],
-    "types": ["node"],
+    "lib": [
+      "es2023"
+    ],
+    "types": [
+      "node"
+    ],
     "strict": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
@@ -17,5 +21,10 @@
     "outDir": "lib",
     "noEmit": true
   },
-  "include": ["src", "test", "vitest.config.mts"]
+  "include": [
+    "src",
+    "test",
+    "scripts",
+    "vitest.config.mts"
+  ]
 }

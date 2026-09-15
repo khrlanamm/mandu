@@ -1,0 +1,164 @@
+/**
+ * Membuat sekolah dan akun uji coba MANDU 2.0 memakai logika Cloud Functions yang sama dengan aplikasi.
+ *
+ * Emulator (default, password semua akun: mandu123):
+ *   firebase emulators:start --project teman-ngadu      # terminal lain, dari root repo
+ *   npm run seed:emulator                                 # dari folder functions
+ *
+ * Produksi (hanya "Sekolah Uji Coba MANDU", tanpa superadmin demo):
+ *   GOOGLE_APPLICATION_CREDENTIALS=~/.config/mandu/service-account.json GCLOUD_PROJECT=teman-ngadu \
+ *     npx tsx scripts/seed.ts --production --password '<password-kuat-min-12>'
+ */
+import type {UserRecord} from "firebase-admin/auth";
+import {FieldValue} from "firebase-admin/firestore";
+import {syncClaims} from "../src/accounts/claims";
+import {ensureUserDoc} from "../src/accounts/users";
+import {auth, db} from "../src/core/firebase";
+import {nisnEmail} from "../src/core/ids";
+import {CONSENT_VERSION} from "../src/domain/catalog";
+import {inviteStaff} from "../src/members/invite";
+import {joinSchool} from "../src/members/join";
+import {reviewMembers} from "../src/members/review";
+import {importStudents} from "../src/members/students";
+import {createSchool} from "../src/schools/manage";
+
+const args = process.argv.slice(2);
+const production = args.includes("--production");
+const passwordIndex = args.indexOf("--password");
+const password = production ? args[passwordIndex + 1] : "mandu123";
+
+function assertSafeTarget(): void {
+  const emulatorHosts = [process.env.FIRESTORE_EMULATOR_HOST, process.env.FIREBASE_AUTH_EMULATOR_HOST];
+  if (!production && emulatorHosts.some((host) => !host)) {
+    throw new Error("Emulator tidak terdeteksi. Jalankan lewat `npm run seed:emulator`, atau pakai --production untuk produksi.");
+  }
+  if (production && emulatorHosts.some(Boolean)) {
+    throw new Error("Mode produksi tidak boleh dijalankan dengan variabel lingkungan emulator.");
+  }
+  if (production && (passwordIndex < 0 || !password || password.length < 12)) {
+    throw new Error("Mode produksi wajib memakai --password dengan minimal 12 karakter.");
+  }
+}
+
+type Role = "admin" | "pimpinan" | "konselor" | "petugas";
+type SummaryRow = {sekolah: string; peran: string; login: string};
+
+const system = {uid: "seed-script", claims: {sa: true}};
+const summary: SummaryRow[] = [];
+
+const userStatus = async (uid: string) => (await db().collection("users").doc(uid).get()).get("status") as string | undefined;
+
+async function ensureAccount(email: string, displayName: string, consent: boolean): Promise<UserRecord> {
+  let record: UserRecord;
+  try {
+    const existing = await auth().getUserByEmail(email);
+    record = await auth().updateUser(existing.uid, {password, displayName, emailVerified: true, disabled: false});
+  } catch (error) {
+    if ((error as {code?: string}).code !== "auth/user-not-found") throw error;
+    record = await auth().createUser({email, password, displayName, emailVerified: true});
+  }
+  await ensureUserDoc(record);
+  await db().collection("users").doc(record.uid).update(
+    consent ?
+      {consentVersion: CONSENT_VERSION, consentAt: FieldValue.serverTimestamp()} :
+      {consentVersion: null, consentAt: null},
+  );
+  return record;
+}
+
+async function ensureSchool(input: {name: string; level: string; city: string; province: string; code: string}): Promise<string> {
+  const code = await db().collection("schoolCodes").doc(input.code).get();
+  if (code.exists) return code.get("schoolId") as string;
+  return (await createSchool(system, input)).schoolId;
+}
+
+async function ensureStaff(
+  school: {id: string; name: string},
+  email: string,
+  displayName: string,
+  role: Role,
+  units: string[] = [],
+  canVerify = false,
+): Promise<void> {
+  const record = await ensureAccount(email, displayName, true);
+  if ((await userStatus(record.uid)) !== "active") {
+    await inviteStaff(system, {schoolId: school.id, email, displayName, role, units, canVerify});
+  }
+  summary.push({sekolah: school.name, peran: `${role}${units.length ? ` (${units.join(", ")})` : ""}`, login: email});
+}
+
+async function ensureStudent(
+  school: {id: string; name: string; code: string},
+  email: string,
+  displayName: string,
+  kelas: string,
+  options: {nisn?: string; approve: boolean; consent: boolean},
+): Promise<void> {
+  const record = await ensureAccount(email, displayName, options.consent);
+  const status = await userStatus(record.uid);
+  if (status !== "active" && status !== "pending") {
+    await joinSchool({uid: record.uid, claims: {}}, {code: school.code, displayName, kelas, nisn: options.nisn});
+  }
+  if (options.approve && (await userStatus(record.uid)) === "pending") {
+    await reviewMembers(system, {schoolId: school.id, uids: [record.uid], approve: true});
+  }
+  summary.push({sekolah: school.name, peran: options.approve ? "siswa aktif" : "calon siswa (menunggu persetujuan)", login: email});
+}
+
+async function ensureNisnStudent(school: {id: string; name: string; code: string}, nisn: string, name: string, kelas: string): Promise<void> {
+  const email = nisnEmail(school.id, nisn);
+  let uid: string;
+  try {
+    uid = (await auth().getUserByEmail(email)).uid;
+  } catch {
+    const result = await importStudents(system, {schoolId: school.id, students: [{nisn, name, kelas}]});
+    if (result.results[0].status !== "created") throw new Error(`Impor NISN ${nisn} gagal: ${result.results[0].message}`);
+    uid = (await auth().getUserByEmail(email)).uid;
+  }
+  await auth().updateUser(uid, {password, disabled: false});
+  await db().collection("users").doc(uid).update({mustChangePassword: true, consentVersion: null, consentAt: null});
+  summary.push({sekolah: school.name, peran: "siswa akun NISN (wajib ganti password)", login: `kode ${school.code} · NISN ${nisn}`});
+}
+
+async function main(): Promise<void> {
+  assertSafeTarget();
+
+  if (!production) {
+    const superadmin = await ensureAccount("superadmin@mandu.test", "Superadmin MANDU", true);
+    await db().collection("users").doc(superadmin.uid).update({isSuperadmin: true});
+    await syncClaims(superadmin.uid);
+    summary.push({sekolah: "(semua sekolah)", peran: "superadmin", login: "superadmin@mandu.test"});
+  }
+
+  const domain = production ? "ujicoba.mandu.test" : "smandemo.sch.id";
+  const code = production ? "UJICOBA" : "DEMO01";
+  const name = production ? "Sekolah Uji Coba MANDU" : "SMA Negeri Demo MANDU";
+  const school = {id: await ensureSchool({name, level: "SMA", city: "Lamongan", province: "Jawa Timur", code}), name, code};
+
+  await ensureStaff(school, `admin@${domain}`, "Andi Wijaya", "admin", [], true);
+  await ensureStaff(school, `kepsek@${domain}`, "Drs. Hartono", "pimpinan");
+  await ensureStaff(school, `bk@${domain}`, "Sri Wahyuni, S.Pd.", "konselor", ["bk_ppks"], true);
+  await ensureStaff(school, `sarpras@${domain}`, "Joko Susilo", "petugas", ["sarpras"]);
+  await ensureStaff(school, `kurikulum@${domain}`, "Ratna Dewi, M.Pd.", "petugas", ["kurikulum"], true);
+  await ensureStudent(school, `siswa@${domain}`, "Budi Santoso", "XI IPA 1", {nisn: "0051111111", approve: true, consent: true});
+  await ensureStudent(school, `siswa2@${domain}`, "Siti Aminah", "X-2", {nisn: "0052222222", approve: true, consent: true});
+  await ensureStudent(school, production ? `calon@${domain}` : "calon.siswa@mandu.test", "Rina Pratiwi", "X-1", {approve: false, consent: false});
+  await ensureNisnStudent(school, "0059990001", "Dewi Lestari", "X-2");
+
+  if (!production) {
+    const secondName = "SMP Harapan Bangsa";
+    const second = {id: await ensureSchool({name: secondName, level: "SMP", city: "Tuban", province: "Jawa Timur", code: "HARAPAN"}), name: secondName};
+    await ensureStaff(second, "admin@smpharapan.sch.id", "Wulan Sari", "admin", [], true);
+  }
+
+  console.log(`\nData uji coba siap (${production ? "PRODUKSI" : "emulator"}). Password: ${production ? "(sesuai --password)" : password}`);
+  console.table(summary);
+}
+
+main().then(
+  () => process.exit(0),
+  (error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+  },
+);

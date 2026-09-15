@@ -15,4 +15,7 @@ abstract final class Env {
   static const nisnEmailDomain = 'nisn.teman-ngadu.web.app';
 
   static const webBaseUrl = 'https://teman-ngadu.web.app';
+
+  /// Harus sama dengan `version` di pubspec.yaml.
+  static const appVersion = '4.0.0';
 }

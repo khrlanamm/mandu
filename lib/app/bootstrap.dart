@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import '../firebase_options.dart';
 import 'app.dart';
@@ -20,6 +21,7 @@ Future<void> bootstrap() async {
   if (Env.useEmulators) await _useEmulators();
 
   await initializeDateFormatting('id_ID');
+  timeago.setLocaleMessages('id', timeago.IdMessages());
   if (!kIsWeb) {
     await GoogleSignIn.instance.initialize(serverClientId: Env.googleServerClientId);
   }
