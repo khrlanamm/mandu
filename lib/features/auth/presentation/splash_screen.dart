@@ -42,7 +42,7 @@ class SplashScreen extends ConsumerWidget {
                   FilledButton.tonal(onPressed: controller.refresh, child: const Text('Coba lagi')),
                   const SizedBox(height: Gaps.sm),
                   TextButton(
-                    onPressed: controller.signOut,
+                    onPressed: () => signOutFromApp(ref),
                     style: TextButton.styleFrom(foregroundColor: Colors.white),
                     child: const Text('Keluar'),
                   ),

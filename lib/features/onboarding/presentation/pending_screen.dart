@@ -115,7 +115,7 @@ class _PendingScreenState extends ConsumerState<PendingScreen> {
                   ],
                   const SizedBox(height: Gaps.sm),
                   TextButton(
-                    onPressed: _busy ? null : () => ref.read(sessionControllerProvider.notifier).signOut(),
+                    onPressed: _busy ? null : () => signOutFromApp(ref),
                     child: const Text('Keluar'),
                   ),
                 ],

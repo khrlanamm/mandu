@@ -65,7 +65,7 @@ class ProfileScreen extends ConsumerWidget {
       confirmLabel: 'Keluar',
       destructive: true,
     );
-    if (confirmed) await ref.read(sessionControllerProvider.notifier).signOut();
+    if (confirmed) await signOutFromApp(ref);
   }
 
   @override

@@ -38,7 +38,7 @@ class _ConsentScreenState extends ConsumerState<ConsentScreen> {
         title: const Text('Kebijakan Privasi'),
         actions: [
           TextButton(
-            onPressed: _busy ? null : () => ref.read(sessionControllerProvider.notifier).signOut(),
+            onPressed: _busy ? null : () => signOutFromApp(ref),
             child: const Text('Keluar'),
           ),
         ],

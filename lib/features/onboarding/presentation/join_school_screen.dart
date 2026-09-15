@@ -211,7 +211,7 @@ class _JoinSchoolScreenState extends ConsumerState<JoinSchoolScreen> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton(
-                      onPressed: _busy ? null : () => ref.read(sessionControllerProvider.notifier).signOut(),
+                      onPressed: _busy ? null : () => signOutFromApp(ref),
                       child: const Text('Keluar'),
                     ),
                   ),

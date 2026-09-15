@@ -62,7 +62,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         title: const Text('Buat Password Baru'),
         actions: [
           TextButton(
-            onPressed: _busy ? null : () => ref.read(sessionControllerProvider.notifier).signOut(),
+            onPressed: _busy ? null : () => signOutFromApp(ref),
             child: const Text('Keluar'),
           ),
         ],

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -113,10 +114,7 @@ class SessionController extends _$SessionController {
     }
   }
 
-  Future<void> signOut() async {
-    await ref.read(pushControllerProvider.notifier).unregister();
-    await ref.read(authRepositoryProvider).signOut();
-  }
+  Future<void> signOut() => ref.read(authRepositoryProvider).signOut();
 }
 
 @riverpod
@@ -124,3 +122,12 @@ AccountSummary? currentAccount(Ref ref) => switch (ref.watch(sessionControllerPr
       SignedIn(:final account) => account,
       _ => null,
     };
+
+/// Keluar dari aplikasi: lepas token perangkat dahulu (masih memerlukan sesi), lalu keluar dari Firebase Auth.
+///
+/// Ditulis sebagai fungsi biasa, bukan provider, agar [SessionController] dan `PushController`
+/// tidak saling bergantung (Riverpod menolak dependensi melingkar).
+Future<void> signOutFromApp(WidgetRef ref) async {
+  await ref.read(pushControllerProvider.notifier).unregister();
+  await ref.read(sessionControllerProvider.notifier).signOut();
+}
