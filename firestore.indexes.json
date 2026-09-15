@@ -17,6 +17,56 @@
       ]
     },
     {
+      "collectionGroup": "tickets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "category", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "tickets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "unitId", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "tickets",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "reminders.verify", "order": "ASCENDING"},
+        {"fieldPath": "sla.verifyDueAt", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "tickets",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "reminders.resolve", "order": "ASCENDING"},
+        {"fieldPath": "sla.resolveDueAt", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "ticketOwners",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "uid", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "timeline",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "visibility", "order": "ASCENDING"},
+        {"fieldPath": "createdAt", "order": "ASCENDING"}
+      ]
+    },
+    {
       "collectionGroup": "reports",
       "queryScope": "COLLECTION",
       "fields": [

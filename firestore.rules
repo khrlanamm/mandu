@@ -20,6 +20,25 @@ service cloud.firestore {
       return inSchool(schoolId) && request.auth.token.get('role', '') in roles;
     }
 
+    function canVerify(schoolId) {
+      return inSchool(schoolId)
+        && (request.auth.token.get('role', '') == 'admin' || request.auth.token.get('canVerify', false) == true);
+    }
+
+    function inUnit(schoolId, unitId) {
+      return hasRole(schoolId, ['konselor', 'petugas']) && unitId in request.auth.token.get('units', []);
+    }
+
+    // Staf yang boleh membaca laporan: admin, pimpinan, Tim Verifikasi, dan unit penangan.
+    function staffSeesTicket(schoolId, unitId) {
+      return hasRole(schoolId, ['admin', 'pimpinan']) || canVerify(schoolId) || inUnit(schoolId, unitId);
+    }
+
+    function ownsTicket(schoolId, ticketId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/schools/$(schoolId)/ticketOwners/$(ticketId)).data.uid == request.auth.uid;
+    }
+
     // ===================== MANDU 2.0 =====================
 
     // Konfigurasi platform (kontak darurat, katalog kategori).
@@ -31,6 +50,18 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
       allow write: if false;
+
+      // Kotak masuk notifikasi: pemilik boleh menandai dibaca atau menghapus.
+      match /notifications/{notificationId} {
+        allow read, delete: if signedIn() && request.auth.uid == uid;
+        allow update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      }
+
+      // Token FCM dikelola lewat account-registerDevice.
+      match /devices/{deviceId} {
+        allow read, write: if false;
+      }
     }
 
     // Indeks kode sekolah hanya dibaca Cloud Functions (schools-lookup).
@@ -58,6 +89,29 @@ service cloud.firestore {
       match /units/{unitId} {
         allow read: if inSchool(schoolId) || isSuperadmin();
         allow write: if false;
+      }
+
+      // Laporan tidak memuat identitas pelapor; superadmin tidak membaca isi laporan.
+      match /tickets/{ticketId} {
+        allow read: if staffSeesTicket(schoolId, resource.data.unitId) || ownsTicket(schoolId, ticketId);
+        allow write: if false;
+
+        // Pelapor hanya melihat riwayat publik; catatan internal khusus staf.
+        match /timeline/{eventId} {
+          allow read: if staffSeesTicket(schoolId, get(/databases/$(database)/documents/schools/$(schoolId)/tickets/$(ticketId)).data.unitId)
+            || (resource.data.visibility == 'public' && ownsTicket(schoolId, ticketId));
+          allow write: if false;
+        }
+      }
+
+      // Pemetaan laporan → pelapor, hanya bisa dibaca pelapor sendiri.
+      match /ticketOwners/{ticketId} {
+        allow read: if signedIn() && resource.data.uid == request.auth.uid;
+        allow write: if false;
+      }
+
+      match /counters/{counterId} {
+        allow read, write: if false;
       }
     }
 

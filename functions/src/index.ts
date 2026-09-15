@@ -1,5 +1,6 @@
 import {setGlobalOptions} from "firebase-functions/v2";
-import {changeInitialPassword, acceptConsent, updateDisplayName} from "./accounts/profile";
+import {onSchedule} from "firebase-functions/v2/scheduler";
+import {acceptConsent, changeInitialPassword, updateDisplayName} from "./accounts/profile";
 import {syncAccount} from "./accounts/sync";
 import {callable} from "./core/callable";
 import {requireAuth, requireSuperadmin} from "./core/claims";
@@ -8,8 +9,20 @@ import {cancelJoin, joinSchool} from "./members/join";
 import {removeMember, updateMember} from "./members/manage";
 import {reviewMembers} from "./members/review";
 import {importStudents, resetStudentPassword} from "./members/students";
+import {registerDevice, unregisterDevice} from "./notifications/notify";
 import {lookupSchool} from "./schools/lookup";
 import {changeSchoolCode, createSchool, updateSchool} from "./schools/manage";
+import {runSlaReminders} from "./tickets/reminders";
+import {submitTicket} from "./tickets/submit";
+import {
+  addTicketProgress,
+  cancelTicket,
+  rateTicket,
+  reassignTicket,
+  resolveTicket,
+  supplyTicketInfo,
+  verifyTicket,
+} from "./tickets/workflow";
 
 setGlobalOptions({region: "us-central1", maxInstances: 10});
 
@@ -22,6 +35,8 @@ export const account = {
     (request) => changeInitialPassword(requireAuth(request), request.data),
   ),
   updateDisplayName: callable("account-updateDisplayName", (request) => updateDisplayName(requireAuth(request), request.data)),
+  registerDevice: callable("account-registerDevice", (request) => registerDevice(requireAuth(request), request.data)),
+  unregisterDevice: callable("account-unregisterDevice", (request) => unregisterDevice(requireAuth(request), request.data)),
 };
 
 export const schools = {
@@ -50,6 +65,23 @@ export const members = {
     (request) => resetStudentPassword(requireAuth(request), request.data),
   ),
 };
+
+/** Layanan Lapor: `tickets-submit`, `tickets-verify`, ... */
+export const tickets = {
+  submit: callable("tickets-submit", (request) => submitTicket(requireAuth(request), request.data)),
+  verify: callable("tickets-verify", (request) => verifyTicket(requireAuth(request), request.data)),
+  supplyInfo: callable("tickets-supplyInfo", (request) => supplyTicketInfo(requireAuth(request), request.data)),
+  cancel: callable("tickets-cancel", (request) => cancelTicket(requireAuth(request), request.data)),
+  addProgress: callable("tickets-addProgress", (request) => addTicketProgress(requireAuth(request), request.data)),
+  resolve: callable("tickets-resolve", (request) => resolveTicket(requireAuth(request), request.data)),
+  reassign: callable("tickets-reassign", (request) => reassignTicket(requireAuth(request), request.data)),
+  rate: callable("tickets-rate", (request) => rateTicket(requireAuth(request), request.data)),
+};
+
+/** Pengingat laporan yang melewati batas waktu verifikasi/tindak lanjut. */
+export const slaReminders = onSchedule({schedule: "every 60 minutes", timeZone: "Asia/Jakarta"}, async () => {
+  await runSlaReminders();
+});
 
 // Dipakai aplikasi 4.0.0 sampai migrasi MANDU 2.0 selesai (lihat rencana tahap 7).
 export {sendReportNotification} from "./legacy/sendReportNotification";

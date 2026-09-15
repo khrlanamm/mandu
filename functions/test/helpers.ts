@@ -10,7 +10,7 @@ if (!firestoreHost || !authHost) {
   throw new Error("Jalankan tes dengan Emulator Suite: npm run test:emulator");
 }
 
-if (getApps().length === 0) initializeApp({projectId: PROJECT_ID});
+if (getApps().length === 0) initializeApp({projectId: PROJECT_ID, storageBucket: `${PROJECT_ID}.appspot.com`});
 
 export const db = getFirestore();
 export const auth = getAuth();

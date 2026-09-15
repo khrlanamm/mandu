@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:emulator": "firebase emulators:exec --only auth,firestore,storage --project demo-mandu \"npm test\"",
+    "test:emulator": "firebase --config ../firebase.test.json emulators:exec --only auth,firestore,storage --project demo-mandu \"npm test\"",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "seed:emulator": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 GCLOUD_PROJECT=teman-ngadu tsx scripts/seed.ts"
