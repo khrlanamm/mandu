@@ -1,6 +1,6 @@
 # Mandu – Teman Ngadu
 
-Aplikasi pelaporan bullying (LaBu) untuk SMAN 1 Sukodadi. Versi 2 ditulis ulang dengan
+Aplikasi pelaporan bullying (LaBu) untuk SMAN 1 Sukodadi. Versi 4 ditulis ulang dengan
 **Flutter**. Package, listing Play Store, dan backend Firebase tetap sama dengan versi Kotlin.
 
 | | |

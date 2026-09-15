@@ -62,18 +62,13 @@ class ReportRepository {
     });
 
     try {
+      // Isi notifikasi dibaca function dari dokumen laporan, bukan dari klien.
       await _functions
           .httpsCallable(
             'sendReportNotification',
             options: HttpsCallableOptions(timeout: const Duration(seconds: 20)),
           )
-          .call({
-        'peran': draft.peran,
-        'deskripsi': draft.deskripsi,
-        'lokasi': draft.lokasi,
-        'tanggalBullying': draft.tanggalBullying,
-        'urlBukti': proofUrl,
-      });
+          .call({'reportId': doc.id});
     } catch (e) {
       // Laporan sudah tersimpan; gagal kirim notifikasi tidak menggagalkan laporan.
       debugPrint('Pemanggilan sendReportNotification gagal: $e');
