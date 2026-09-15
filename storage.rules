@@ -61,6 +61,26 @@ service firebase.storage {
         && (roleIn(schoolId, ['admin']) || inTicketUnit(schoolId, ticketId));
     }
 
+    // Gambar dalam percakapan Curhat: hanya siswa pemilik dan konselor yang menangani.
+    function conversation(schoolId, conversationId) {
+      return firestore.get(/databases/(default)/documents/schools/$(schoolId)/conversations/$(conversationId)).data;
+    }
+
+    function inConversation(schoolId, conversationId) {
+      return signedIn()
+        && (conversation(schoolId, conversationId).studentUid == request.auth.uid
+          || conversation(schoolId, conversationId).counselorUid == request.auth.uid);
+    }
+
+    match /schools/{schoolId}/conversations/{conversationId}/{fileName} {
+      allow get: if inConversation(schoolId, conversationId);
+      allow create: if inConversation(schoolId, conversationId)
+        && resource == null
+        && conversation(schoolId, conversationId).status != 'selesai'
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
     // ============ Aplikasi 4.0.0 (dihapus setelah migrasi) ============
     match /laporan_bukti/{fileName} {
       allow get: if signedIn();

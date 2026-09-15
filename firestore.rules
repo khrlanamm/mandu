@@ -114,6 +114,65 @@ service cloud.firestore {
         }
       }
 
+      // Butuh Bantuan: hanya siswa pemilik dan konselor sekolah (admin melihat angka agregat saja).
+      match /helpRequests/{requestId} {
+        allow read: if (signedIn() && resource.data.studentUid == request.auth.uid) || hasRole(schoolId, ['konselor']);
+        allow write: if false;
+      }
+
+      // Curhat: siswa pemilik, konselor yang menangani, dan (sebelum diambil) konselor lain.
+      match /conversations/{conversationId} {
+        function conversation() {
+          return get(/databases/$(database)/documents/schools/$(schoolId)/conversations/$(conversationId)).data;
+        }
+        function isStudent() { return signedIn() && resource.data.studentUid == request.auth.uid; }
+        function isAssigned() { return signedIn() && resource.data.counselorUid == request.auth.uid; }
+        function marksRead(field) {
+          return request.resource.data.diff(resource.data).affectedKeys().hasOnly([field])
+            && request.resource.data[field] == 0;
+        }
+
+        allow read: if isStudent() || isAssigned()
+          || (hasRole(schoolId, ['konselor']) && resource.data.counselorUid == null);
+        // Satu-satunya penulisan dari aplikasi: menandai pesan sudah dibaca.
+        allow update: if (isStudent() && marksRead('unreadStudent')) || (isAssigned() && marksRead('unreadCounselor'));
+        allow create, delete: if false;
+
+        match /messages/{messageId} {
+          allow read: if signedIn()
+            && (conversation().studentUid == request.auth.uid || conversation().counselorUid == request.auth.uid);
+          allow create: if signedIn()
+            && conversation().status != 'selesai'
+            && request.resource.data.senderUid == request.auth.uid
+            && request.resource.data.createdAt == request.time
+            && request.resource.data.keys().hasAll(['senderUid', 'senderRole', 'text', 'createdAt'])
+            && request.resource.data.keys().hasOnly(['senderUid', 'senderRole', 'text', 'imagePath', 'createdAt'])
+            && request.resource.data.text is string
+            && request.resource.data.text.size() <= 4000
+            && (request.resource.data.text.size() > 0 || request.resource.data.get('imagePath', null) != null)
+            && ((conversation().studentUid == request.auth.uid && request.resource.data.senderRole == 'siswa')
+              || (conversation().counselorUid == request.auth.uid && request.resource.data.senderRole == 'konselor'));
+          allow update, delete: if false;
+        }
+
+        // Identitas asli siswa (bila dibuka) — hanya konselor yang menangani.
+        match /private/{docId} {
+          allow read: if signedIn() && conversation().counselorUid == request.auth.uid;
+          allow write: if false;
+        }
+
+        // Catatan kasus konselor, tidak pernah terlihat siswa.
+        match /caseNotes/{noteId} {
+          allow read: if signedIn() && conversation().counselorUid == request.auth.uid;
+          allow create: if signedIn() && conversation().counselorUid == request.auth.uid
+            && request.resource.data.keys().hasOnly(['text', 'riskLevel', 'authorName', 'createdAt'])
+            && request.resource.data.text is string && request.resource.data.text.size() <= 4000
+            && request.resource.data.riskLevel in ['tidak_ada', 'perhatian', 'tinggi']
+            && request.resource.data.createdAt == request.time;
+          allow update, delete: if false;
+        }
+      }
+
       // Aspirasi tanpa identitas pengirim: staf pengelola, siswa (hanya yang tampil di papan), atau pengirimnya.
       match /aspirations/{aspirationId} {
         allow read: if readsAspirationInbox(schoolId)
