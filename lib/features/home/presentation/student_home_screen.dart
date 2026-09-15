@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../app/routes.dart';
 
 import '../../../core/design/palette.dart';
 import '../../../core/design/tokens.dart';
@@ -25,7 +28,12 @@ class StudentHomeScreen extends ConsumerWidget {
       };
 
   void _open(BuildContext context, ManduService service) {
-    showSnack(context, 'Layanan ${service.label} sedang disiapkan.');
+    switch (service) {
+      case ManduService.lapor:
+        context.push(Routes.studentReport);
+      default:
+        showSnack(context, 'Layanan ${service.label} sedang disiapkan.');
+    }
   }
 
   @override

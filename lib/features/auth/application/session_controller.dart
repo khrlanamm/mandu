@@ -8,6 +8,7 @@ import '../../../core/errors.dart';
 import '../../../core/firebase/firebase_providers.dart';
 import '../../account/data/account_repository.dart';
 import '../../account/domain/account_summary.dart';
+import '../../notifications/application/push_controller.dart';
 import '../data/auth_repository.dart';
 
 part 'session_controller.g.dart';
@@ -112,7 +113,10 @@ class SessionController extends _$SessionController {
     }
   }
 
-  Future<void> signOut() => ref.read(authRepositoryProvider).signOut();
+  Future<void> signOut() async {
+    await ref.read(pushControllerProvider.notifier).unregister();
+    await ref.read(authRepositoryProvider).signOut();
+  }
 }
 
 @riverpod

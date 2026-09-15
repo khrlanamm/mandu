@@ -16,11 +16,20 @@ abstract final class Routes {
   static const studentActivity = '/home/aktivitas';
   static const studentNotifications = '/home/notifikasi';
   static const studentAccount = '/home/akun';
+  static const studentReport = '/home/lapor';
+
+  static String studentReportForm(String category) => '/home/lapor/$category';
+
+  static String studentTicket(String ticketId, {bool justSubmitted = false}) =>
+      '/home/laporan/$ticketId${justSubmitted ? '?baru=1' : ''}';
 
   static const staffHome = '/staff';
   static const staffTasks = '/staff/tugas';
   static const staffSchool = '/staff/sekolah';
   static const staffAccount = '/staff/akun';
+  static const staffNotifications = '/staff/notifikasi';
+
+  static String staffTicket(String ticketId) => '/staff/laporan/$ticketId';
 
   static const superadminHome = '/superadmin';
   static const superadminNewSchool = '/superadmin/sekolah/baru';

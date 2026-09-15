@@ -47,7 +47,7 @@ final class SessionControllerProvider
   }
 }
 
-String _$sessionControllerHash() => r'c38167fd97c46d941c4730e4379d57801075c88c';
+String _$sessionControllerHash() => r'5563c43efcb244a47fdcd4ada19581f63a2b5791';
 
 /// Status login + profil MANDU. Memantau `users/{uid}.claimsVersion` agar
 /// perubahan peran (mis. disetujui admin) langsung berlaku tanpa login ulang.

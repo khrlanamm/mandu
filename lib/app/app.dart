@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/design/theme.dart';
+import '../features/notifications/application/push_controller.dart';
 import 'router.dart';
 
 class ManduApp extends ConsumerWidget {
@@ -10,6 +11,7 @@ class ManduApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(pushControllerProvider);
     return MaterialApp.router(
       title: 'MANDU',
       debugShowCheckedModeBanner: false,

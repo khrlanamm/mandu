@@ -7,11 +7,17 @@ import '../features/auth/presentation/email_login_screen.dart';
 import '../features/auth/presentation/nisn_login_screen.dart';
 import '../features/auth/presentation/splash_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
-import '../features/home/presentation/placeholder_screen.dart';
 import '../features/home/presentation/staff_home_screen.dart';
 import '../features/home/presentation/staff_shell.dart';
 import '../features/home/presentation/student_home_screen.dart';
 import '../features/home/presentation/student_shell.dart';
+import '../features/lapor/presentation/my_activity_screen.dart';
+import '../features/lapor/presentation/report_category_screen.dart';
+import '../features/lapor/presentation/report_form_screen.dart';
+import '../features/lapor/presentation/staff_tasks_screen.dart';
+import '../features/lapor/presentation/staff_ticket_screen.dart';
+import '../features/lapor/presentation/student_ticket_screen.dart';
+import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/onboarding/presentation/change_password_screen.dart';
 import '../features/onboarding/presentation/consent_screen.dart';
 import '../features/onboarding/presentation/join_school_screen.dart';
@@ -58,6 +64,29 @@ GoRouter router(Ref ref) {
       ),
       GoRoute(path: Routes.pending, builder: (context, state) => const PendingScreen()),
       GoRoute(path: Routes.account, builder: (context, state) => const ProfileScreen()),
+      // Layar penuh di atas shell (tanpa navigasi bawah), juga tujuan notifikasi.
+      GoRoute(
+        path: Routes.studentReport,
+        builder: (context, state) => const ReportCategoryScreen(),
+        routes: [
+          GoRoute(
+            path: ':category',
+            builder: (context, state) => ReportFormScreen(categoryKey: state.pathParameters['category']!),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/home/laporan/:ticketId',
+        builder: (context, state) => StudentTicketScreen(
+          ticketId: state.pathParameters['ticketId']!,
+          justSubmitted: state.uri.queryParameters['baru'] == '1',
+        ),
+      ),
+      GoRoute(
+        path: '/staff/laporan/:ticketId',
+        builder: (context, state) => StaffTicketScreen(ticketId: state.pathParameters['ticketId']!),
+      ),
+      GoRoute(path: Routes.staffNotifications, builder: (context, state) => const NotificationsScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => StudentShell(shell: shell),
         branches: [
@@ -65,10 +94,10 @@ GoRouter router(Ref ref) {
             GoRoute(path: Routes.studentHome, builder: (context, state) => const StudentHomeScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.studentActivity, builder: (context, state) => const PlaceholderScreen.activity()),
+            GoRoute(path: Routes.studentActivity, builder: (context, state) => const MyActivityScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.studentNotifications, builder: (context, state) => const PlaceholderScreen.notifications()),
+            GoRoute(path: Routes.studentNotifications, builder: (context, state) => const NotificationsScreen()),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(path: Routes.studentAccount, builder: (context, state) => const ProfileScreen()),
@@ -82,7 +111,7 @@ GoRouter router(Ref ref) {
             GoRoute(path: Routes.staffHome, builder: (context, state) => const StaffHomeScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: Routes.staffTasks, builder: (context, state) => const PlaceholderScreen.tasks()),
+            GoRoute(path: Routes.staffTasks, builder: (context, state) => const StaffTasksScreen()),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(

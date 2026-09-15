@@ -105,11 +105,20 @@ class StatusPill extends StatelessWidget {
 }
 
 class ShellDestination {
-  const ShellDestination({required this.label, required this.icon, required this.selectedIcon});
+  const ShellDestination({required this.label, required this.icon, required this.selectedIcon, this.badge = 0});
 
   final String label;
   final IconData icon;
   final IconData selectedIcon;
+
+  /// Angka pada ikon (mis. notifikasi belum dibaca). 0 = tanpa badge.
+  final int badge;
+
+  Widget buildIcon({required bool selected}) {
+    final icon = Icon(selected ? selectedIcon : this.icon);
+    if (badge <= 0) return icon;
+    return Badge(label: Text(badge > 99 ? '99+' : '$badge'), child: icon);
+  }
 }
 
 /// Navigasi bawah di HP, NavigationRail di tablet/web.
@@ -140,8 +149,8 @@ class AdaptiveShell extends StatelessWidget {
                   destinations: [
                     for (final destination in destinations)
                       NavigationRailDestination(
-                        icon: Icon(destination.icon),
-                        selectedIcon: Icon(destination.selectedIcon),
+                        icon: destination.buildIcon(selected: false),
+                        selectedIcon: destination.buildIcon(selected: true),
                         label: Text(destination.label),
                       ),
                   ],
@@ -160,8 +169,8 @@ class AdaptiveShell extends StatelessWidget {
             destinations: [
               for (final destination in destinations)
                 NavigationDestination(
-                  icon: Icon(destination.icon),
-                  selectedIcon: Icon(destination.selectedIcon),
+                  icon: destination.buildIcon(selected: false),
+                  selectedIcon: destination.buildIcon(selected: true),
                   label: destination.label,
                 ),
             ],
