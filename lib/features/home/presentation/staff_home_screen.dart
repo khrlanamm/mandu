@@ -83,7 +83,16 @@ class StaffHomeScreen extends ConsumerWidget {
                   const SizedBox(height: Gaps.xl),
                   SectionHeader(
                     title: 'Laporan',
-                    action: TextButton(onPressed: () => context.go(Routes.staffTasks), child: const Text('Buka tugas')),
+                    action: Wrap(
+                      children: [
+                        if (access?.seesAll ?? false)
+                          TextButton(
+                            onPressed: () => context.push(Routes.staffDashboard),
+                            child: const Text('Dashboard'),
+                          ),
+                        TextButton(onPressed: () => context.go(Routes.staffTasks), child: const Text('Buka tugas')),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: Gaps.md),
                   if (access != null && !access.seesAll && access.units.isEmpty)

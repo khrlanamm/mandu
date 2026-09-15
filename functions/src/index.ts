@@ -16,6 +16,7 @@ import {
 } from "./care/conversations";
 import {cancelHelp, claimHelp, closeHelp, requestHelp} from "./care/help";
 import {deleteArticle, markArticleRead, saveArticle} from "./education/articles";
+import {platformStats, schoolStats} from "./stats/compute";
 import {optionalCaller, submitAspiration, submitPublicAspiration} from "./aspirations/submit";
 import {callable} from "./core/callable";
 import {requireAuth, requireSuperadmin} from "./core/claims";
@@ -102,6 +103,12 @@ export const aspirations = {
     submitPublicAspiration(optionalCaller(request), request.data, request.rawRequest.ip)),
   review: callable("aspirations-review", (request) => reviewAspiration(requireAuth(request), request.data)),
   support: callable("aspirations-support", (request) => supportAspiration(requireAuth(request), request.data)),
+};
+
+/** Dashboard: `stats-school` (admin, pimpinan, Tim Verifikasi) dan `stats-platform` (superadmin). */
+export const stats = {
+  school: callable("stats-school", (request) => schoolStats(requireAuth(request), request.data)),
+  platform: callable("stats-platform", (request) => platformStats(requireAuth(request))),
 };
 
 /** Edukasi: `articles-save`, `articles-delete`, `articles-markRead`. */

@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Manual Penggunaan MANDU 2.0</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root {
+    --navy: #0E1B3D;
+    --blue: #2563EB;
+    --blue-soft: #DCE7FF;
+    --ink: #1B2440;
+    --muted: #5B6784;
+    --line: #D8DFEC;
+    --lapor: #E5484D;
+    --curhat: #0E9F8E;
+    --aspirasi: #E8930C;
+    --bantuan: #7C5CFC;
+    --edukasi: #2F6FED;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Plus Jakarta Sans", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    font-size: 10.5pt;
+    line-height: 1.55;
+  }
+  h1, h2, h3, h4 { color: var(--navy); line-height: 1.25; }
+  h1 { font-size: 26pt; margin: 0 0 6pt; letter-spacing: -0.5pt; }
+  h2 { font-size: 16pt; margin: 0 0 10pt; padding-bottom: 6pt; border-bottom: 2px solid var(--blue-soft); }
+  h3 { font-size: 12.5pt; margin: 16pt 0 4pt; }
+  h4 { font-size: 11pt; margin: 12pt 0 3pt; }
+  p, li { margin: 0 0 6pt; }
+  ol, ul { padding-left: 16pt; margin: 0 0 8pt; }
+  a { color: var(--blue); text-decoration: none; }
+  code { background: #F1F4F9; padding: 1pt 4pt; border-radius: 3pt; font-size: 9.5pt; }
+
+  .cover { height: 247mm; display: flex; flex-direction: column; justify-content: center; }
+  .cover .brand { display: flex; align-items: center; gap: 10pt; margin-bottom: 26pt; }
+  .cover .brand img { width: 54pt; height: 54pt; }
+  .cover .brand span { font-size: 20pt; font-weight: 800; color: var(--navy); letter-spacing: -0.5pt; }
+  .cover .sub { font-size: 13pt; color: var(--muted); margin-bottom: 26pt; max-width: 120mm; }
+  .cover .meta { border-top: 1px solid var(--line); padding-top: 12pt; color: var(--muted); font-size: 10pt; }
+
+  .page { page-break-before: always; }
+  .lead { font-size: 11pt; color: var(--muted); margin-bottom: 12pt; }
+
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 12pt; font-size: 9.5pt; }
+  th, td { border: 1px solid var(--line); padding: 5pt 7pt; text-align: left; vertical-align: top; }
+  th { background: #F4F6FB; color: var(--navy); font-weight: 700; }
+
+  .note, .warn, .tip {
+    border-radius: 6pt; padding: 8pt 10pt; margin: 8pt 0 12pt; font-size: 9.8pt;
+    border-left: 3pt solid var(--blue); background: #F4F7FE;
+  }
+  .warn { border-left-color: var(--lapor); background: #FDF1F1; }
+  .tip { border-left-color: var(--curhat); background: #EEF9F7; }
+  .note b, .warn b, .tip b { color: var(--navy); }
+
+  figure { margin: 10pt 0 14pt; page-break-inside: avoid; }
+  figure img { width: 62mm; border: 1px solid var(--line); border-radius: 8pt; display: block; }
+  figure.wide img { width: 120mm; }
+  figcaption { font-size: 9pt; color: var(--muted); margin-top: 4pt; }
+  .shots { display: flex; gap: 8mm; flex-wrap: wrap; }
+  .shots figure { margin: 0 0 10pt; }
+
+  .pill { display: inline-block; font-size: 8.5pt; font-weight: 700; padding: 2pt 7pt; border-radius: 999pt; background: var(--blue-soft); color: #1E3A8A; }
+  .pill.lapor { background: #FFE5E5; color: #8C1D23; }
+  .pill.curhat { background: #D7F5F0; color: #065F55; }
+  .pill.aspirasi { background: #FFF0D1; color: #7A4A02; }
+  .pill.bantuan { background: #ECE6FF; color: #3F2A9E; }
+  .pill.edukasi { background: #E0EAFF; color: #173B8F; }
+
+  .toc ol { list-style: none; padding: 0; }
+  .toc li { border-bottom: 1px dotted var(--line); padding: 4pt 0; }
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps > li { counter-increment: step; position: relative; padding-left: 22pt; margin-bottom: 7pt; }
+  .steps > li::before {
+    content: counter(step); position: absolute; left: 0; top: 1pt;
+    width: 15pt; height: 15pt; border-radius: 50%; background: var(--blue); color: #fff;
+    font-size: 8.5pt; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="brand">
+    <img src="img/logo.svg" alt="Logo MANDU">
+    <span>MANDU 2.0</span>
+  </div>
+  <h1>Manual Penggunaan<br>Aplikasi &amp; Dashboard</h1>
+  <p class="sub">Media Aspirasi, Notifikasi, dan Dukungan Siswa — “Teman Mengadu, Sekolah Berbenah”.
+  Panduan lengkap untuk siswa, guru BK, petugas unit, admin sekolah, pimpinan, dan superadmin.</p>
+  <div class="meta">
+    <div><b>Versi aplikasi:</b> 4.0.0 (MANDU 2.0)</div>
+    <div><b>Dokumen:</b> panduan penggunaan dengan akun uji coba</div>
+    <div><b>Tanggal:</b> 16 September 2026</div>
+  </div>
+</section>
+
+<section class="page toc">
+  <h2>Daftar Isi</h2>
+  <ol>
+    <li>1. Tentang MANDU 2.0</li>
+    <li>2. Peran dan hak akses</li>
+    <li>3. Akun uji coba</li>
+    <li>4. Masuk ke aplikasi</li>
+    <li>5. Panduan siswa: Lapor</li>
+    <li>6. Panduan siswa: Curhat</li>
+    <li>7. Panduan siswa: Butuh Bantuan</li>
+    <li>8. Panduan siswa: Aspirasi</li>
+    <li>9. Panduan siswa: Edukasi &amp; notifikasi</li>
+    <li>10. Panduan Tim Verifikasi (admin &amp; guru yang diberi hak)</li>
+    <li>11. Panduan Petugas Unit</li>
+    <li>12. Panduan Guru BK (Curhat &amp; Butuh Bantuan)</li>
+    <li>13. Panduan Admin Sekolah</li>
+    <li>14. Dashboard sekolah (admin &amp; pimpinan)</li>
+    <li>15. Panduan Superadmin</li>
+    <li>16. Aspirasi tanpa login (tamu)</li>
+    <li>17. Privasi dan kerahasiaan</li>
+    <li>18. Pertanyaan yang sering diajukan</li>
+  </ol>
+</section>
+
+<section class="page">
+  <h2>1. Tentang MANDU 2.0</h2>
+  <p class="lead">MANDU adalah ruang aman bagi siswa untuk bersuara, dan alat kerja bagi sekolah untuk menindaklanjuti
+  suara tersebut secara tertib dan terukur.</p>
+  <p>MANDU 2.0 memiliki lima pintu layanan:</p>
+  <table>
+    <tr><th style="width:26%">Layanan</th><th>Untuk apa</th><th style="width:22%">Ditangani</th></tr>
+    <tr><td><span class="pill lapor">Lapor</span></td><td>Masalah yang perlu ditangani sekolah: perundungan, fasilitas rusak, kebersihan, pembelajaran, administrasi, kesiswaan.</td><td>Tim Verifikasi → unit terkait</td></tr>
+    <tr><td><span class="pill curhat">Curhat</span></td><td>Cerita pribadi lewat percakapan dengan guru BK, boleh memakai nama samaran.</td><td>Guru BK</td></tr>
+    <tr><td><span class="pill aspirasi">Aspirasi</span></td><td>Saran, ide, usulan, dan kritik membangun untuk sekolah. Bisa dikirim tanpa login.</td><td>Admin sekolah / Tim Verifikasi</td></tr>
+    <tr><td><span class="pill bantuan">Butuh Bantuan</span></td><td>Minta bantuan tanpa harus menjelaskan panjang lebar.</td><td>Guru BK</td></tr>
+    <tr><td><span class="pill edukasi">Edukasi</span></td><td>Artikel, tautan, dan info beasiswa dari MANDU maupun sekolah.</td><td>Superadmin &amp; sekolah</td></tr>
+  </table>
+  <p><b>Alur kerja MANDU:</b> siswa mengirim → Tim Verifikasi memeriksa → diteruskan ke unit → unit menindaklanjuti →
+  siswa menerima kabar dan memberi penilaian → sekolah melihat hasilnya di dashboard.</p>
+  <div class="note"><b>Satu aplikasi, banyak sekolah.</b> Setiap sekolah punya kode gabung sendiri (contoh: <code>DEMO01</code>).
+  Data satu sekolah tidak pernah terlihat oleh sekolah lain.</div>
+</section>
+
+<section class="page">
+  <h2>2. Peran dan hak akses</h2>
+  <table>
+    <tr><th style="width:22%">Peran</th><th>Yang bisa dilakukan</th></tr>
+    <tr><td><b>Siswa</b></td><td>Mengirim laporan, aspirasi, curhat, dan permintaan bantuan; memantau status; memberi penilaian; membaca Edukasi.</td></tr>
+    <tr><td><b>Tim Verifikasi</b><br><span class="pill">admin + guru yang ditunjuk</span></td><td>Memeriksa laporan baru, meminta data tambahan, meneruskan ke unit, menolak laporan, mengalihkan unit, menanggapi aspirasi.</td></tr>
+    <tr><td><b>Petugas Unit</b></td><td>Menangani laporan yang diteruskan ke unitnya: menambah perkembangan, mengunggah dokumentasi, menyelesaikan laporan.</td></tr>
+    <tr><td><b>Guru BK / Konselor</b></td><td>Menangani Curhat dan Butuh Bantuan, mencatat catatan kasus, mengusulkan jadwal temu; juga menangani laporan unit BK/PPKS.</td></tr>
+    <tr><td><b>Admin Sekolah</b></td><td>Semua kewenangan Tim Verifikasi, ditambah kelola anggota, impor akun NISN, undangan staf, pengaturan sekolah, konten Edukasi sekolah, dan dashboard.</td></tr>
+    <tr><td><b>Pimpinan</b></td><td>Membaca laporan, aspirasi, dan dashboard. Tidak mengubah status dan tidak melihat isi Curhat.</td></tr>
+    <tr><td><b>Superadmin</b></td><td>Mengelola sekolah dan admin sekolah, konten Edukasi global, serta dashboard lintas sekolah (hanya angka).</td></tr>
+    <tr><td><b>Tamu</b></td><td>Mengirim aspirasi tanpa login lewat kode atau QR sekolah.</td></tr>
+  </table>
+  <div class="warn"><b>Yang tidak bisa dilihat siapa pun selain yang berhak:</b> isi Curhat dan Butuh Bantuan hanya untuk
+  siswa yang bersangkutan dan guru BK. Identitas pelapor yang memilih “Rahasiakan identitas” tidak terlihat oleh staf mana pun,
+  termasuk admin dan pimpinan.</div>
+</section>
+
+<section class="page">
+  <h2>3. Akun uji coba</h2>
+  <p class="lead">Akun berikut dibuat oleh skrip <code>npm run seed:emulator</code> pada sekolah demo
+  <b>SMA Negeri Demo MANDU</b> (kode gabung <code>DEMO01</code>). Semua memakai kata sandi <code>mandu123</code>.</p>
+  <table>
+    <tr><th style="width:28%">Peran</th><th>Akun</th><th style="width:34%">Dipakai untuk mencoba</th></tr>
+    <tr><td>Superadmin</td><td><code>superadmin@mandu.test</code></td><td>Kelola sekolah, Edukasi global, dashboard platform</td></tr>
+    <tr><td>Admin Sekolah (Tim Verifikasi)</td><td><code>admin@smandemo.sch.id</code></td><td>Verifikasi laporan, anggota, dashboard, aspirasi</td></tr>
+    <tr><td>Pimpinan</td><td><code>kepsek@smandemo.sch.id</code></td><td>Mode pantau: dashboard dan daftar laporan</td></tr>
+    <tr><td>Guru BK (Tim Verifikasi)</td><td><code>bk@smandemo.sch.id</code></td><td>Curhat, Butuh Bantuan, laporan keamanan</td></tr>
+    <tr><td>Petugas Sarpras</td><td><code>sarpras@smandemo.sch.id</code></td><td>Menangani laporan fasilitas &amp; kebersihan</td></tr>
+    <tr><td>Petugas Kurikulum</td><td><code>kurikulum@smandemo.sch.id</code></td><td>Menangani laporan pembelajaran</td></tr>
+    <tr><td>Siswa</td><td><code>siswa@smandemo.sch.id</code> (Budi Santoso)</td><td>Semua layanan siswa</td></tr>
+    <tr><td>Siswa kedua</td><td><code>siswa2@smandemo.sch.id</code> (Siti Aminah)</td><td>Dukungan aspirasi, laporan anonim</td></tr>
+    <tr><td>Calon siswa</td><td><code>calon.siswa@mandu.test</code></td><td>Menunggu persetujuan admin</td></tr>
+    <tr><td>Akun NISN</td><td>kode <code>DEMO01</code> · NISN <code>0059990001</code></td><td>Masuk tanpa Google, wajib ganti kata sandi</td></tr>
+    <tr><td>Admin sekolah kedua</td><td><code>admin@smpharapan.sch.id</code></td><td>Membuktikan data antar sekolah terpisah</td></tr>
+  </table>
+  <div class="tip"><b>Data contoh yang ikut dibuat:</b> 6 laporan (dari menunggu verifikasi sampai selesai dan dinilai),
+  3 aspirasi, 2 permintaan bantuan, 1 percakapan curhat, dan 4 konten Edukasi.</div>
+</section>
+
+<section class="page">
+  <h2>4. Masuk ke aplikasi</h2>
+  <div class="shots">
+    <figure><img src="img/welcome.png" alt="Halaman awal MANDU"><figcaption>Halaman awal: tiga cara masuk dan tombol aspirasi tanpa login.</figcaption></figure>
+    <figure><img src="img/login-email.png" alt="Masuk dengan email"><figcaption>Layar “Masuk dengan Email”. Saat memakai emulator, daftar akun demo bisa langsung diketuk.</figcaption></figure>
+  </div>
+  <h3>Tiga cara masuk</h3>
+  <ol class="steps">
+    <li><b>Masuk dengan Google</b> — untuk siswa dan staf yang memakai akun Google sekolah atau pribadi.</li>
+    <li><b>Masuk dengan Akun Sekolah (NISN)</b> — untuk siswa yang akunnya dibuat admin lewat impor CSV: masukkan kode sekolah, NISN, dan kata sandi awal. Saat pertama masuk, aplikasi meminta penggantian kata sandi.</li>
+    <li><b>Masuk dengan email</b> — untuk guru dan staf yang dibuatkan akun oleh admin sekolah.</li>
+  </ol>
+  <h3>Langkah pertama setelah masuk</h3>
+  <ol class="steps">
+    <li>Membaca dan menyetujui <b>Kebijakan Privasi</b> MANDU.</li>
+    <li>Bagi siswa baru: <b>Gabung Sekolah</b> dengan mengetik kode sekolah atau memindai QR, lalu mengisi nama dan kelas.</li>
+    <li>Menunggu <b>persetujuan admin</b>. Bila email siswa memakai domain resmi sekolah, persetujuan berjalan otomatis.</li>
+  </ol>
+  <div class="note"><b>Kode sekolah</b> bisa dilihat admin di menu <i>Sekolah → Pengaturan</i>, lengkap dengan QR untuk ditempel di mading.</div>
+</section>
+
+<section class="page">
+  <h2>5. Panduan siswa: Lapor</h2>
+  <p class="lead">Gunakan Lapor untuk masalah yang perlu ditangani sekolah. Laporan diperiksa Tim Verifikasi lalu
+  diteruskan ke unit yang tepat.</p>
+  <div class="shots">
+    <figure><img src="img/siswa-beranda.png" alt="Beranda siswa"><figcaption>Beranda siswa dengan lima pintu layanan.</figcaption></figure>
+    <figure><img src="img/lapor-kategori.png" alt="Pilih kategori laporan"><figcaption>Langkah 1: pilih jenis masalah.</figcaption></figure>
+  </div>
+  <ol class="steps">
+    <li>Ketuk kartu <b>Lapor</b> di beranda.</li>
+    <li>Pilih <b>kategori</b> yang paling sesuai, lalu pilih <b>jenis masalah</b>.</li>
+    <li>Isi <b>judul singkat</b>, <b>cerita kejadian</b>, dan <b>lokasi</b>. Tanggal dan jam kejadian membantu sekolah menelusuri.</li>
+    <li>Untuk kategori Keamanan &amp; Perlindungan, ada isian tambahan: peranmu (korban/saksi), seberapa sering, dan pihak yang terlibat. Semuanya boleh dikosongkan.</li>
+    <li>Lampirkan <b>foto atau PDF</b> (maksimal 5 berkas, masing-masing 10 MB) bila ada bukti.</li>
+    <li>Atur <b>“Rahasiakan identitasku”</b>. Untuk laporan keamanan, pilihan ini menyala otomatis.</li>
+    <li>Ketuk <b>Kirim laporan</b>, lalu konfirmasi. Kamu akan menerima nomor laporan, misalnya <code>MND-2026-0007</code>.</li>
+  </ol>
+  <div class="shots">
+    <figure><img src="img/lapor-form.png" alt="Formulir laporan"><figcaption>Formulir laporan beserta pengaturan privasi.</figcaption></figure>
+    <figure><img src="img/laporan-detail-siswa.png" alt="Detail laporan siswa"><figcaption>Detail laporan: status, riwayat, dan tindakan yang tersedia.</figcaption></figure>
+  </div>
+  <h3>Memantau laporan</h3>
+  <ul>
+    <li>Tab <b>Aktivitas</b> memuat semua laporanmu beserta statusnya.</li>
+    <li>Status berjalan: <i>Menunggu verifikasi → Diteruskan ke unit → Sedang diproses → Selesai</i>.</li>
+    <li>Bila sekolah meminta tambahan data, statusnya menjadi <b>Perlu dilengkapi</b>; ketuk <b>Lengkapi laporan</b> untuk menjawab.</li>
+    <li>Selama laporan belum diteruskan, kamu bisa <b>membatalkan</b> laporan.</li>
+    <li>Setelah selesai, beri <b>penilaian 1–5 bintang</b> dan komentar bila perlu.</li>
+  </ul>
+</section>
+
+<section class="page">
+  <h2>6. Panduan siswa: Curhat</h2>
+  <div class="shots">
+    <figure><img src="img/curhat-list.png" alt="Daftar percakapan curhat"><figcaption>Daftar percakapan dan kontak bantuan darurat.</figcaption></figure>
+    <figure><img src="img/chat.png" alt="Percakapan dengan guru BK"><figcaption>Percakapan dengan guru BK.</figcaption></figure>
+  </div>
+  <ol class="steps">
+    <li>Ketuk kartu <b>Curhat</b>, lalu <b>Mulai curhat</b>.</li>
+    <li>Pilih guru BK tertentu atau <b>“Siapa saja yang tersedia”</b>.</li>
+    <li>Bila belum siap memakai nama asli, nyalakan <b>Pakai nama samaran</b> dan isi nama samaranmu.</li>
+    <li>Tulis topik (opsional) dan pesan pertama, lalu kirim.</li>
+    <li>Balas pesan seperti chat biasa; kamu juga bisa mengirim gambar.</li>
+    <li>Bila sudah nyaman, buka menu ⋮ → <b>Buka identitasku</b> agar guru BK tahu siapa kamu.</li>
+    <li>Menu ⋮ juga berisi <b>Kontak darurat</b> dan <b>Tutup percakapan</b>.</li>
+  </ol>
+  <div class="warn"><b>Penting.</b> MANDU bukan layanan darurat. Bila keadaan mendesak, hubungi 112, SAPA 129, atau
+  Sehat Jiwa 119 ext. 8, dan temui guru terdekat.</div>
+</section>
+
+<section class="page">
+  <h2>7. Panduan siswa: Butuh Bantuan</h2>
+  <figure><img src="img/bantuan-form.png" alt="Formulir butuh bantuan"><figcaption>Cukup pilih kebutuhan, urgensi, dan cara dihubungi.</figcaption></figure>
+  <ol class="steps">
+    <li>Ketuk kartu <b>Butuh Bantuan</b> lalu tombol <b>Minta bantuan</b>.</li>
+    <li>Pilih satu atau beberapa kebutuhan, termasuk pilihan <b>“Belum siap cerita”</b>.</li>
+    <li>Pilih urgensi: bisa menunggu, hari ini, atau sekarang juga.</li>
+    <li>Pilih cara dihubungi (chat, bertemu, atau WhatsApp) dan waktu yang nyaman.</li>
+    <li>Kirim. Guru BK akan mengambil permintaanmu; bila memilih chat, percakapan Curhat otomatis dibuka.</li>
+  </ol>
+  <p>Selama belum diambil guru BK, permintaan bisa dibatalkan. Setelah selesai, guru BK menuliskan pesan penutup yang bisa kamu baca.</p>
+</section>
+
+<section class="page">
+  <h2>8. Panduan siswa: Aspirasi</h2>
+  <figure><img src="img/aspirasi-papan.png" alt="Papan aspirasi"><figcaption>Papan aspirasi: usulan yang disetujui sekolah beserta dukungan siswa.</figcaption></figure>
+  <ol class="steps">
+    <li>Ketuk kartu <b>Aspirasi</b>. Tab <b>Papan aspirasi</b> memuat aspirasi yang ditampilkan sekolah; tab <b>Aspirasiku</b> memuat aspirasi yang kamu kirim.</li>
+    <li>Ketuk <b>Kirim aspirasi</b>, pilih jenis (saran, ide, usulan, kritik) dan topik.</li>
+    <li>Tulis judul dan isi aspirasi. Kata kasar akan disamarkan otomatis.</li>
+    <li>Bila ingin, nyalakan <b>Rahasiakan identitasku</b>; kamu tetap menerima tanggapan sekolah.</li>
+    <li>Dukung aspirasi teman dengan tombol <b>Dukung</b> (satu suara per siswa).</li>
+  </ol>
+  <p>Status aspirasi: <i>Diterima → Sedang ditinjau → Ditindaklanjuti → Direalisasikan</i>, atau
+  <i>Belum dapat ditindaklanjuti</i> yang selalu disertai tanggapan resmi sekolah.</p>
+</section>
+
+<section class="page">
+  <h2>9. Panduan siswa: Edukasi &amp; notifikasi</h2>
+  <div class="shots">
+    <figure><img src="img/edukasi.png" alt="Layar Edukasi"><figcaption>Bacaan dan info beasiswa dari MANDU serta sekolah.</figcaption></figure>
+    <figure><img src="img/notifikasi.png" alt="Kotak notifikasi"><figcaption>Kotak notifikasi: kabar laporan, aspirasi, dan pesan.</figcaption></figure>
+  </div>
+  <ul>
+    <li><b>Bacaan</b> — cari artikel, saring menurut kategori, dan simpan artikel dengan ikon <b>bookmark</b>.</li>
+    <li><b>Beasiswa</b> — daftar beasiswa diurutkan menurut tenggat; tombol pendaftaran membuka situs resmi.</li>
+    <li><b>Tersimpan</b> — ikon bookmark di kanan atas menampilkan semua artikel yang kamu simpan.</li>
+    <li><b>Notifikasi</b> — tab ketiga memuat kabar terbaru: perubahan status laporan, permintaan data, tanggapan aspirasi, dan balasan guru BK. Ketuk untuk langsung membuka detailnya; geser untuk menghapus.</li>
+  </ul>
+</section>
+
+<section class="page">
+  <h2>10. Panduan Tim Verifikasi</h2>
+  <p class="lead">Tim Verifikasi adalah admin sekolah dan guru/staf yang diberi hak verifikasi. Merekalah yang memutuskan
+  laporan diteruskan, dilengkapi, atau ditolak.</p>
+  <div class="shots">
+    <figure><img src="img/staf-tugas.png" alt="Tab tugas staf"><figcaption>Tab Tugas: antrean laporan dengan penanda prioritas dan batas waktu.</figcaption></figure>
+    <figure><img src="img/staf-detail-laporan.png" alt="Detail laporan staf"><figcaption>Detail laporan dengan tiga tombol keputusan di bawah layar.</figcaption></figure>
+  </div>
+  <ol class="steps">
+    <li>Buka tab <b>Tugas</b>. Saring dengan chip <b>Perlu verifikasi</b>, <b>Ditangani</b>, <b>Menunggu pelapor</b>, atau <b>Selesai</b>.</li>
+    <li>Laporan darurat dan yang lewat batas waktu selalu berada di urutan teratas.</li>
+    <li>Buka sebuah laporan, baca isi dan lampirannya. Perhatikan penanda <b>prioritas</b>, <b>kemungkinan laporan ganda</b>, dan <b>saran kategori</b>.</li>
+    <li>Pilih salah satu keputusan:
+      <ul>
+        <li><b>Teruskan</b> — tentukan kategori, jenis masalah, unit penangan, dan prioritas; boleh menambahkan pesan untuk pelapor.</li>
+        <li><b>Minta data</b> — tuliskan data yang kurang; status berubah menjadi <i>Perlu dilengkapi</i>.</li>
+        <li><b>Tolak</b> — pilih alasan (duplikat, tidak valid, bukan wewenang, lainnya) dan jelaskan secukupnya.</li>
+      </ul>
+    </li>
+    <li>Setelah diteruskan, kamu masih bisa <b>Alihkan unit</b> atau menambahkan <b>Catatan internal</b> lewat menu ⋮.</li>
+  </ol>
+  <figure class="wide"><img src="img/staf-verifikasi-sheet.png" alt="Formulir verifikasi"><figcaption>Formulir “Verifikasi &amp; teruskan”.</figcaption></figure>
+</section>
+
+<section class="page">
+  <h2>11. Panduan Petugas Unit</h2>
+  <ol class="steps">
+    <li>Buka tab <b>Tugas</b>; kamu hanya melihat laporan yang diteruskan ke unitmu.</li>
+    <li>Buka laporan, lalu ketuk <b>Tambah progres</b> untuk mengabari pelapor. Status otomatis menjadi <i>Sedang diproses</i>.</li>
+    <li>Gunakan sakelar <b>“Hanya untuk staf”</b> bila catatan tidak perlu dibaca pelapor.</li>
+    <li>Unggah dokumentasi bila perlu (foto sebelum/sesudah).</li>
+    <li>Bila selesai, ketuk <b>Selesaikan</b>, tulis ringkasan tindak lanjut, dan lampirkan dokumentasi. Pelapor akan diminta memberi penilaian.</li>
+  </ol>
+  <div class="note"><b>Batas waktu.</b> Setiap laporan punya batas verifikasi dan tindak lanjut sesuai pengaturan sekolah.
+  Laporan yang terlambat ditandai merah dan pengingat otomatis dikirim tiap jam.</div>
+</section>
+
+<section class="page">
+  <h2>12. Panduan Guru BK</h2>
+  <figure class="wide"><img src="img/konselor-ruang.png" alt="Ruang konselor"><figcaption>Ruang konselor: antrean Butuh Bantuan dan percakapan Curhat.</figcaption></figure>
+  <h3>Butuh Bantuan</h3>
+  <ol class="steps">
+    <li>Buka <b>Beranda → Ruang konselor → tab Butuh Bantuan</b>.</li>
+    <li>Baca permintaan yang <b>Menunggu konselor</b>; permintaan darurat ditandai jelas.</li>
+    <li>Ketuk <b>Ambil permintaan ini</b>. Bila siswa memilih chat, percakapan otomatis dibuka dengan pesan pembuka.</li>
+    <li>Setelah pendampingan selesai, ketuk <b>Tutup</b> dan tulis pesan penutup untuk siswa.</li>
+  </ol>
+  <h3>Curhat</h3>
+  <ol class="steps">
+    <li>Tab <b>Curhat</b> memuat percakapan yang menunggu konselor dan percakapan milikmu.</li>
+    <li>Buka percakapan yang menunggu lalu ketuk <b>Ambil</b> untuk mulai membalas.</li>
+    <li>Menu ⋮ menyediakan <b>Catatan kasus</b> (privat, dengan penanda risiko) dan <b>Usulkan jadwal temu</b>.</li>
+    <li>Bila siswa memakai nama samaran, identitas hanya terlihat setelah siswa membukanya sendiri.</li>
+  </ol>
+  <div class="warn"><b>Kerahasiaan.</b> Admin sekolah dan pimpinan tidak dapat membaca isi Curhat maupun permintaan bantuan.
+  Dashboard hanya menampilkan jumlahnya.</div>
+</section>
+
+<section class="page">
+  <h2>13. Panduan Admin Sekolah</h2>
+  <div class="shots">
+    <figure><img src="img/staf-beranda.png" alt="Beranda staf"><figcaption>Beranda admin: ringkasan laporan dan pintasan pengelolaan.</figcaption></figure>
+    <figure><img src="img/admin-persetujuan.png" alt="Persetujuan siswa"><figcaption>Menyetujui siswa yang mendaftar dengan kode sekolah.</figcaption></figure>
+  </div>
+  <h3>Anggota</h3>
+  <ul>
+    <li><b>Persetujuan siswa</b> — periksa nama dan kelas, lalu setujui atau tolak (sekaligus banyak).</li>
+    <li><b>Anggota &amp; peran</b> — ubah peran, unit yang ditangani, dan hak <b>Tim Verifikasi</b>; keluarkan anggota bila perlu.</li>
+    <li><b>Undang staf</b> — kirim undangan lewat email, atau buatkan akun email/sandi bagi staf tanpa Google.</li>
+    <li><b>Impor akun NISN</b> — unggah CSV berisi NISN, nama, dan kelas; unduh daftar kata sandi awal untuk dibagikan.</li>
+  </ul>
+  <h3>Pengaturan sekolah</h3>
+  <ul>
+    <li>Nama, jenjang, alamat, dan domain email sekolah (untuk persetujuan otomatis).</li>
+    <li><b>Kode gabung dan QR</b> — bagikan atau ganti bila bocor.</li>
+    <li><b>Layanan aktif</b> — nyalakan/matikan Lapor, Curhat, Aspirasi, Butuh Bantuan, Edukasi.</li>
+    <li><b>Aspirasi tanpa login</b> dan <b>papan aspirasi</b>.</li>
+    <li><b>Target waktu (SLA)</b> verifikasi, tindak lanjut, dan laporan darurat.</li>
+  </ul>
+  <h3>Aspirasi dan Edukasi</h3>
+  <ul>
+    <li><b>Aspirasi masuk</b> — beri status dan tanggapan resmi, lalu putuskan apakah aspirasi ditampilkan di papan.</li>
+    <li><b>Konten Edukasi sekolah</b> — tulis artikel, tautan, atau info beasiswa khusus sekolahmu; simpan sebagai draf atau terbitkan.</li>
+  </ul>
+</section>
+
+<section class="page">
+  <h2>14. Dashboard sekolah</h2>
+  <figure class="wide"><img src="img/dashboard.png" alt="Dashboard sekolah"><figcaption>Dashboard: ringkasan, tren bulanan, kategori, dan kinerja unit.</figcaption></figure>
+  <ol class="steps">
+    <li>Buka <b>Beranda → Dashboard</b> (tersedia untuk admin, pimpinan, dan Tim Verifikasi).</li>
+    <li>Pilih periode 3, 6, atau 12 bulan lewat ikon kalender.</li>
+    <li>Baca kartu ringkas: total laporan, selesai, sedang diproses, menunggu verifikasi, dan lewat batas waktu.</li>
+    <li>Periksa <b>rata-rata waktu verifikasi dan penyelesaian</b>, serta <b>kepuasan pelapor</b>.</li>
+    <li>Telusuri <b>tren bulanan</b>, <b>komposisi kategori</b>, <b>kinerja tiap unit</b> (termasuk persentase tepat waktu), dan <b>lokasi yang sering dilaporkan</b>.</li>
+    <li>Ketuk ikon unduh untuk <b>ekspor CSV</b> yang bisa dibuka di Excel atau Google Sheets.</li>
+  </ol>
+  <div class="note"><b>Untuk evaluasi.</b> Bagian “Layanan lain” menampilkan jumlah aspirasi, permintaan bantuan, dan percakapan
+  curhat — tanpa isi percakapan — agar sekolah tetap dapat mengukur beban layanan.</div>
+</section>
+
+<section class="page">
+  <h2>15. Panduan Superadmin</h2>
+  <div class="shots">
+    <figure><img src="img/superadmin-sekolah.png" alt="Daftar sekolah"><figcaption>Daftar sekolah yang terdaftar di MANDU.</figcaption></figure>
+    <figure><img src="img/superadmin-dashboard.png" alt="Dashboard platform"><figcaption>Dashboard platform: volume lintas sekolah.</figcaption></figure>
+  </div>
+  <ul>
+    <li><b>Tambah sekolah</b> — isi nama, jenjang, kota, provinsi; kode gabung dibuat otomatis (boleh ditentukan sendiri).</li>
+    <li><b>Kelola sekolah</b> — buka sekolah untuk mengatur anggota, unit, dan pengaturannya seperti admin sekolah.</li>
+    <li><b>Edukasi global</b> — konten yang dibaca semua sekolah.</li>
+    <li><b>Dashboard platform</b> — jumlah sekolah aktif, anggota, laporan, dan aspirasi per sekolah.</li>
+  </ul>
+  <div class="warn"><b>Batas kewenangan superadmin:</b> tidak dapat membaca isi laporan, curhat, maupun permintaan bantuan sekolah.</div>
+</section>
+
+<section class="page">
+  <h2>16. Aspirasi tanpa login (tamu)</h2>
+  <figure><img src="img/aspirasi-tamu.png" alt="Aspirasi tanpa login"><figcaption>Formulir aspirasi tanpa login lewat kode sekolah.</figcaption></figure>
+  <ol class="steps">
+    <li>Di halaman awal aplikasi, ketuk <b>Kirim aspirasi tanpa login</b>, lalu masukkan kode sekolah.</li>
+    <li>Melalui web, buka <code>teman-ngadu.web.app/s/DEMO01/aspirasi</code> atau pindai QR sekolah.</li>
+    <li>Pilih jenis dan topik, tulis aspirasi, lalu kirim. Nomor aspirasi ditampilkan sebagai tanda terima.</li>
+  </ol>
+  <p>Aspirasi tamu dikirim tanpa identitas dan tidak dapat dilacak. Untuk memantau tanggapan, siswa disarankan masuk ke aplikasi.</p>
+</section>
+
+<section class="page">
+  <h2>17. Privasi dan kerahasiaan</h2>
+  <table>
+    <tr><th style="width:34%">Data</th><th>Siapa yang bisa melihat</th></tr>
+    <tr><td>Laporan biasa</td><td>Tim Verifikasi, unit penangan, admin, pimpinan</td></tr>
+    <tr><td>Identitas pelapor yang dirahasiakan</td><td>Tidak ada seorang pun di sekolah; hanya sistem yang memakainya untuk mengirim notifikasi</td></tr>
+    <tr><td>Isi Curhat</td><td>Siswa yang bersangkutan dan guru BK yang menangani</td></tr>
+    <tr><td>Permintaan Butuh Bantuan</td><td>Siswa yang mengirim dan guru BK</td></tr>
+    <tr><td>Catatan kasus konselor</td><td>Hanya guru BK yang menangani</td></tr>
+    <tr><td>Aspirasi di papan</td><td>Siswa sekolah tersebut, tanpa nama pengirim</td></tr>
+    <tr><td>Dashboard</td><td>Angka saja; isi percakapan tidak pernah ditampilkan</td></tr>
+  </table>
+  <p>Semua perubahan data penting dilakukan lewat server (Cloud Functions) dan dilindungi aturan keamanan Firebase,
+  sehingga aplikasi tidak bisa mengubah status laporan atau membaca data yang bukan haknya.</p>
+</section>
+
+<section class="page">
+  <h2>18. Pertanyaan yang sering diajukan</h2>
+  <h4>Saya lupa kata sandi akun NISN.</h4>
+  <p>Hubungi admin sekolah. Admin dapat membuat kata sandi baru lewat <i>Anggota → detail siswa → Buat password baru</i>.</p>
+  <h4>Apakah guru tahu siapa yang melapor?</h4>
+  <p>Tidak, bila kamu menyalakan “Rahasiakan identitasku”. Nomor WhatsApp yang kamu isi sendiri dapat membuatmu dikenali.</p>
+  <h4>Laporan saya ditolak. Apa yang harus dilakukan?</h4>
+  <p>Baca alasannya di detail laporan. Bila masalah belum selesai, kirim laporan baru dengan data yang lebih lengkap,
+  atau sampaikan lewat Aspirasi jika sifatnya usulan.</p>
+  <h4>Berapa lama laporan diproses?</h4>
+  <p>Sesuai target sekolah: umumnya 24 jam untuk verifikasi (2 jam untuk laporan darurat) dan 72 jam untuk tindak lanjut.</p>
+  <h4>Apakah aspirasi saya pasti tampil di papan?</h4>
+  <p>Tidak semua. Admin memilih aspirasi yang bermanfaat bagi banyak siswa. Semua aspirasi tetap mendapat tanggapan resmi.</p>
+  <h4>Saya siswa pindahan. Bagaimana pindah sekolah di MANDU?</h4>
+  <p>Minta admin sekolah lama mengeluarkan keanggotaanmu, lalu gabung ke sekolah baru memakai kode sekolah tersebut.</p>
+</section>
+
+</body>
+</html>

@@ -4,6 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/aspirasi/presentation/aspiration_hub_screen.dart';
 import '../features/care/presentation/conversation_screen.dart';
+import '../features/dashboard/presentation/dashboard_screen.dart';
+import '../features/dashboard/presentation/platform_dashboard_screen.dart';
 import '../features/edukasi/presentation/article_admin_screen.dart';
 import '../features/edukasi/presentation/article_editor_screen.dart';
 import '../features/edukasi/presentation/article_screen.dart';
@@ -105,6 +107,8 @@ GoRouter router(Ref ref) {
         builder: (context, state) => StaffTicketScreen(ticketId: state.pathParameters['ticketId']!),
       ),
       GoRoute(path: Routes.staffNotifications, builder: (context, state) => const NotificationsScreen()),
+      GoRoute(path: Routes.staffDashboard, builder: (context, state) => const DashboardScreen()),
+      GoRoute(path: Routes.superadminDashboard, builder: (context, state) => const PlatformDashboardScreen()),
       GoRoute(
         path: Routes.studentEducation,
         builder: (context, state) => const EducationScreen(),

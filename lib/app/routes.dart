@@ -51,6 +51,7 @@ abstract final class Routes {
   static const staffAspirations = '/staff/aspirasi';
 
   /// Ruang kerja konselor (Butuh Bantuan + Curhat).
+  static const staffDashboard = '/staff/dashboard';
   static const staffCare = '/staff/bk';
   static const staffEducation = '/staff/edukasi';
   static const staffArticleNew = '/staff/edukasi/tulis';
@@ -74,6 +75,7 @@ abstract final class Routes {
 
   static String superadminSchool(String schoolId) => '/superadmin/sekolah/$schoolId';
 
+  static const superadminDashboard = '/superadmin/dashboard';
   static const superadminEducation = '/superadmin/edukasi';
   static const superadminArticleNew = '/superadmin/edukasi/tulis';
 

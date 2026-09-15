@@ -34,6 +34,13 @@ class _SuperadminSchoolsScreenState extends ConsumerState<SuperadminSchoolsScree
 
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            tooltip: 'Dashboard platform',
+            onPressed: () => context.push(Routes.superadminDashboard),
+            icon: const Icon(Icons.insights_rounded),
+          ),
+        ],
         title: const Row(children: [ManduLogo(size: 26, showWordmark: false), SizedBox(width: Gaps.sm), Text('Konsol Superadmin')]),
       ),
       floatingActionButton: FloatingActionButton.extended(

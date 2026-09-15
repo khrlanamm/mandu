@@ -1,7 +1,8 @@
 # MANDU 2.0 — Catatan Progres & Serah Terima
 
-- Rencana lengkap yang sudah disetujui: `/Users/benevology/.claude/plans/snuggly-gathering-gosling.md`
-- Branch kerja: `mandu-2.0`. Jangan bekerja di `master`.
+- Rencana lengkap yang disetujui: `/Users/benevology/.claude/plans/snuggly-gathering-gosling.md`
+- Branch kerja: `mandu-2.0` (sudah di-push ke `github.com/khrlanamm/mandu`). Jangan bekerja di `master`.
+- Daftar bug yang ditemukan dan diperbaiki: `docs/bug-temuan.md`.
 
 ## Cara menjalankan (lokal)
 
@@ -12,119 +13,81 @@ export PATH=/opt/homebrew/opt/openjdk@21/bin:$PATH
 npm --prefix functions run build
 firebase emulators:start --only auth,firestore,functions,storage --project teman-ngadu
 
-# 2. Data uji coba (terminal lain): sekolah, akun demo (password mandu123), 6 contoh laporan
+# 2. Data uji coba: sekolah, akun demo (password mandu123), contoh laporan/aspirasi/bantuan/curhat/edukasi
 cd functions && npm run seed:emulator
 
-# 3. Aplikasi Android terhubung ke emulator
+# 3. Aplikasi Android terhubung ke emulator (APK debug universal terlalu besar untuk emulator)
 flutter build apk --debug --split-per-abi --target-platform android-arm64 --dart-define=MANDU_EMULATOR=true
 adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk
 ```
 
-- APK debug universal (±200 MB) gagal dipasang karena penyimpanan emulator penuh. Gunakan build `arm64` di atas.
-- Di layar "Masuk dengan email" ada daftar akun demo yang bisa langsung diketuk.
+Data Emulator Suite tidak disimpan; setiap emulator dinyalakan ulang, jalankan seed lagi.
 
 **Tes**
-- Functions dan rules: `cd functions && npm run test:emulator` → 43 tes. Tes memakai port emulator terpisah (`firebase.test.json`), jadi bisa berjalan bersamaan dengan emulator dev.
+- Backend + rules: `cd functions && npm run test:emulator` → **71 tes** (memakai port emulator terpisah `firebase.test.json`, aman berjalan bersama emulator dev).
 - Flutter: `flutter analyze && flutter test` → 18 tes.
+
+## Akun uji coba (emulator, password `mandu123`)
+
+| Peran | Login |
+|---|---|
+| Superadmin | `superadmin@mandu.test` |
+| Admin Sekolah (Tim Verifikasi) | `admin@smandemo.sch.id` |
+| Pimpinan | `kepsek@smandemo.sch.id` |
+| Konselor (BK, Tim Verifikasi) | `bk@smandemo.sch.id` |
+| Petugas Sarpras | `sarpras@smandemo.sch.id` |
+| Petugas Kurikulum (Tim Verifikasi) | `kurikulum@smandemo.sch.id` |
+| Siswa | `siswa@smandemo.sch.id` (Budi), `siswa2@smandemo.sch.id` (Siti) |
+| Calon siswa (menunggu persetujuan) | `calon.siswa@mandu.test` |
+| Siswa akun NISN | kode `DEMO01` · NISN `0059990001` |
+| Admin sekolah kedua | `admin@smpharapan.sch.id` (kode `HARAPAN`) |
+
+Sekolah demo: **SMA Negeri Demo MANDU**, kode gabung `DEMO01`.
 
 ## Selesai
 
-### Tahap 0 — Fondasi
-- Logo dan brand:
-  - logo konsep A "Suara Siswa" (`design/logo/*.svg`);
-  - ikon Android dan web dibuat dengan `tool/brand/generate.sh`.
-- Toolchain: Flutter 3.47.4 / Dart 3.13.3, Riverpod 3 + generator, go_router 18, freezed 4.
-- Cloud Functions ditulis dengan TypeScript: firebase-functions v7, admin v14, zod 4, vitest.
+### Tahap 0–1 — Fondasi, identitas, multi-sekolah
+- Brand, ikon, dan splash MANDU 2.0 (`tool/brand/generate.sh`).
+- Flutter 3.47 + Riverpod 3 + go_router 18 + freezed 4; Cloud Functions TypeScript (firebase-functions v7).
+- Login Google, akun NISN, dan email staf; onboarding (persetujuan privasi, ganti password, gabung sekolah lewat kode/QR).
+- Peran: superadmin, admin sekolah, pimpinan, konselor, petugas unit, siswa; custom claims `{sid, role, units[], canVerify}`.
+- Admin sekolah: persetujuan siswa, anggota & peran, undang staf, impor CSV NISN, pengaturan sekolah & kode.
 
-### Tahap 1 — Identitas & multi-sekolah
-Backend (commit `3f29808`):
-- Callable functions:
-  - `account-*`: sync, consent, ganti password, nama, register/unregister device;
-  - `schools-*`: lookup, create, update, changeCode;
-  - `members-*`: join, review, update, remove, invite, importStudents, resetStudentPassword.
-- Custom claims: `{sa}` untuk superadmin; `{sid, role, units[], canVerify}` untuk anggota sekolah.
-- Email akun NISN: `{schoolId}.{nisn}@nisn.teman-ngadu.web.app`.
+### Tahap 2 — Lapor
+- Nomor `MND-YYYY-NNNN`, klasifikasi prioritas otomatis, saran kategori, deteksi kemungkinan duplikat.
+- Identitas pelapor disimpan terpisah (`ticketOwners`) sehingga mode rahasia benar-benar rahasia.
+- Alur: verifikasi (teruskan / minta data / tolak) → unit menangani (progres, catatan internal) → selesai → penilaian siswa.
+- SLA: batas verifikasi & tindak lanjut, penanda terlambat, pengingat terjadwal tiap jam.
+- Lampiran foto/PDF di Storage dengan cross-service rules.
 
-Aplikasi (commit `dbd06d8`):
-- Login: Google, NISN, email staf.
-- Onboarding: persetujuan privasi, ganti password awal, gabung sekolah lewat kode atau QR, layar menunggu persetujuan.
-- Shell per peran: siswa, staf, superadmin.
-- Admin sekolah: persetujuan siswa, anggota & peran, undang staf, impor CSV NISN, pengaturan sekolah.
-- Superadmin: daftar sekolah dan buat sekolah.
-- Diverifikasi di emulator Android: login admin, beranda, dan persetujuan siswa berjalan.
+### Tahap 3 — Aspirasi
+- Siswa mengirim aspirasi (identitas bisa dirahasiakan) dan tamu lewat `/s/{kode}/aspirasi` tanpa login.
+- Penyamaran kata kasar, pembatasan pengiriman per IP dan per akun.
+- Tanggapan resmi sekolah, status (diterima → ditinjau → ditindaklanjuti → direalisasikan / belum dapat).
+- Papan aspirasi untuk siswa dengan dukungan satu suara per siswa.
 
-### Skrip seed `functions/scripts/seed.ts`
-**Emulator** (password `mandu123`):
+### Tahap 4 — Curhat & Butuh Bantuan
+- Butuh Bantuan: pilih kebutuhan, urgensi, cara & waktu dihubungi; konselor mengambil, lanjut ke percakapan, lalu menutup dengan pesan penutup.
+- Curhat: pilih konselor atau "siapa saja", nama samaran, chat teks/gambar realtime, buka identitas, usulan jadwal temu, catatan kasus privat konselor.
+- Hanya siswa pemilik dan konselor terkait yang bisa membaca; admin sekolah tidak.
+- Kontak darurat nasional (112, 129, 119) tampil di layanan ini.
 
-| Sekolah | Akun |
-|---|---|
-| — | `superadmin@mandu.test` |
-| SMA Negeri Demo MANDU (kode `DEMO01`) | `admin@` (verifikator), `kepsek@`, `bk@` (bk_ppks, verifikator), `sarpras@`, `kurikulum@` (verifikator), `siswa@` (Budi), `siswa2@` (Siti) — semua `@smandemo.sch.id` |
-| SMA Negeri Demo MANDU | `calon.siswa@mandu.test` (menunggu persetujuan) |
-| SMA Negeri Demo MANDU | NISN `0059990001` (wajib ganti password) |
-| SMP Harapan Bangsa (kode `HARAPAN`) | `admin@smpharapan.sch.id` |
-
-**Enam contoh laporan**, satu per status:
-1. Selesai dan dinilai
-2. Perundungan siber rahasia, sedang diproses BK, ada catatan internal
-3. Menunggu verifikasi, lewat batas waktu
-4. Perlu dilengkapi
-5. Ditolak (bukan wewenang)
-6. Darurat
-
-**Produksi** (`--production --password <≥12>`):
-- Hanya "Sekolah Uji Coba MANDU" (kode `UJICOBA`, domain `ujicoba.mandu.test`).
-- Tanpa superadmin demo.
-
-### Tahap 2 — Lapor end-to-end
-Backend (commit `3174004`):
-- `tickets-submit`:
-  - nomor `MND-YYYY-NNNN` per sekolah per tahun;
-  - klasifikasi prioritas dari kata kunci;
-  - saran kategori;
-  - deteksi kemungkinan duplikat (7 hari, lokasi sama);
-  - identitas pelapor disimpan terpisah di `ticketOwners`.
-- `tickets-verify`: teruskan, minta data, atau tolak.
-- Callable lain: `supplyInfo`, `cancel`, `addProgress` (publik atau internal), `resolve`, `reassign`, `rate`.
-- Notifikasi: kotak masuk `users/{uid}/notifications` + FCM (kanal `mandu_urgent`/`mandu_updates`).
-- `slaReminders` terjadwal setiap 60 menit.
-- Rules Firestore/Storage untuk laporan, timeline, lampiran, dan tindak lanjut.
-
-Aplikasi (commit `84ee61d`):
-- **Siswa**
-  - Lapor: pilih kategori → formulir (lampiran foto/PDF, mode rahasia, detail keamanan).
-  - Tab Aktivitas.
-  - Detail laporan: progres, riwayat publik, lengkapi data, batalkan, beri penilaian.
-- **Staf**
-  - Tab Tugas: filter per status dan antrean prioritas.
-  - Detail laporan: pelapor atau "dirahasiakan", tanda duplikat, saran kategori.
-  - Aksi: Tolak / Minta data / Teruskan (kategori, unit, prioritas), Tambah progres / Selesaikan, catatan internal, alihkan unit.
-  - Beranda staf menampilkan ringkasan laporan.
-- **Umum:** notifikasi (tab siswa, lonceng staf, badge), registrasi token FCM saat login dan pelepasan saat keluar.
+### Tahap 5 — Edukasi
+- Artikel global (superadmin) dan artikel sekolah (admin/konselor): artikel Markdown, tautan, dan info beasiswa dengan tenggat.
+- Pencarian, filter kategori, konten unggulan, tersimpan (bookmark), hitungan dibaca.
 
 ## Sedang dikerjakan
-- Uji alur Lapor di emulator Android (siswa → verifikator → unit → siswa menilai).
-  - Perbaikan pertama: bar aksi di detail laporan staf memenuhi layar (Align tanpa `heightFactor`).
+- **Tahap 6 — Dashboard & web:** agregasi statistik sekolah dan platform (`functions/src/stats/compute.ts`) sudah ditulis; berikutnya layar dashboard (fl_chart), ekspor CSV, dan deploy web ke Firebase Hosting.
 
 ## Berikutnya
-- **Tahap 3 — Aspirasi**
-  - Siswa login, dengan opsi sembunyikan identitas.
-  - Tamu tanpa login lewat `/s/{kode}/aspirasi` (web + app) memakai Anonymous auth, rate limit, dan filter kata.
-  - Moderasi dan tanggapan resmi.
-  - Papan aspirasi dan dukungan.
-- **Tahap 4:** Curhat (chat realtime) & Butuh Bantuan.
-- **Tahap 5:** Edukasi (CMS global/sekolah, beasiswa, bookmark, migrasi 50 artikel).
-- **Tahap 6:**
-  - Dashboard: `stats/{yyyy-mm}`, fl_chart, ekspor CSV, dashboard superadmin.
-  - `flutterfire configure` platform web, lalu deploy Hosting `teman-ngadu.web.app`.
+- **Manual book PDF** penggunaan aplikasi + dashboard memakai akun uji coba.
 - **Tahap 7 — Rilis**
-  - Migrasi produksi: 44 laporan → tiket, 50 artikel, superadmin & admin.
-  - Seed Sekolah Uji Coba.
-  - Deploy functions/rules/indexes; App Check.
-  - AAB versionName 4.0.0 (versionCode ≥ 13) → Play Console.
-- **Tutorial** lengkap aplikasi + dashboard dengan akun uji coba.
+  - Migrasi produksi: 44 laporan → tiket, 50 artikel (**wajib menambahkan field `published: true`**), superadmin & admin sekolah.
+  - Seed "Sekolah Uji Coba MANDU" di produksi.
+  - Deploy functions, rules, dan indexes; aktifkan App Check.
+  - Build AAB versionName 4.0.0 (versionCode ≥ 13) dan unggah ke Play Console — **dikerjakan belakangan sesuai permintaan user**.
 
 ## Catatan keamanan
-- Password keystore hanya ada di `android/key.properties` (gitignored).
-- Service account, bila diperlukan, disimpan di `~/.config/mandu/`, di luar repo.
-- Produksi masih memakai functions dan rules versi 4.0.0 (sudah diperketat). Kode MANDU 2.0 **belum di-deploy**.
+- Password keystore hanya di `android/key.properties` (gitignored); service account di `~/.config/mandu/`.
+- Produksi masih memakai functions dan rules aplikasi 4.0.0. Kode MANDU 2.0 belum di-deploy.
+- Pengujian notifikasi push dilakukan user di perangkat nyata (bukan di emulator).
