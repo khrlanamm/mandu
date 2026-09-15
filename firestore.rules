@@ -1,13 +1,69 @@
 rules_version = '2';
 
 // Deploy: firebase deploy --only firestore:rules
+// Semua penulisan data MANDU 2.0 lewat Cloud Functions; rules mengatur akses baca.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {
       return request.auth != null;
     }
 
-    function isAdmin() {
+    function isSuperadmin() {
+      return signedIn() && request.auth.token.get('sa', false) == true;
+    }
+
+    function inSchool(schoolId) {
+      return signedIn() && request.auth.token.get('sid', '') == schoolId;
+    }
+
+    function hasRole(schoolId, roles) {
+      return inSchool(schoolId) && request.auth.token.get('role', '') in roles;
+    }
+
+    // ===================== MANDU 2.0 =====================
+
+    // Konfigurasi platform (kontak darurat, katalog kategori).
+    match /platform/{docId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Indeks kode sekolah hanya dibaca Cloud Functions (schools-lookup).
+    match /schoolCodes/{code} {
+      allow read, write: if false;
+    }
+
+    match /invitations/{invitationId} {
+      allow read: if isSuperadmin() || hasRole(resource.data.schoolId, ['admin']);
+      allow write: if false;
+    }
+
+    match /schools/{schoolId} {
+      allow read: if inSchool(schoolId) || isSuperadmin();
+      allow write: if false;
+
+      // Siswa yang masih menunggu persetujuan tetap bisa membaca keanggotaannya sendiri.
+      match /members/{uid} {
+        allow read: if (signedIn() && request.auth.uid == uid)
+          || hasRole(schoolId, ['admin', 'pimpinan'])
+          || isSuperadmin();
+        allow write: if false;
+      }
+
+      match /units/{unitId} {
+        allow read: if inSchool(schoolId) || isSuperadmin();
+        allow write: if false;
+      }
+    }
+
+    // ============ Aplikasi 4.0.0 (dihapus setelah migrasi) ============
+
+    function isLegacyAdmin() {
       return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
@@ -28,25 +84,21 @@ service cloud.firestore {
         && data.timestamp is timestamp;
     }
 
-    // Artikel edukasi: dibaca pengguna yang login, dikelola lewat Firebase console.
     match /articles/{articleId} {
       allow read: if signedIn();
       allow write: if false;
     }
 
-    // Daftar admin dikelola lewat Firebase console. Admin hanya boleh
-    // memperbarui fcmToken miliknya sendiri.
     match /admins/{uid} {
       allow get: if signedIn() && request.auth.uid == uid;
       allow update: if signedIn() && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fcmToken']);
     }
 
-    // Laporan bullying berisi data sensitif: hanya pelapor dan admin yang boleh membaca.
     match /reports/{reportId} {
-      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      allow read: if isLegacyAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
       allow create: if signedIn() && validNewReport(request.resource.data);
-      allow update: if isAdmin()
+      allow update: if isLegacyAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status in ['terlapor', 'ditangani'];
       allow delete: if signedIn()
