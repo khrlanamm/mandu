@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Konsep C "Perisai Bersuara": ruang aman (perisai) untuk menyampaikan suara (gelembung). -->
+  <defs>
+    <linearGradient id="c-shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1E3A8A"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#c-shield)" stroke="url(#c-shield)" stroke-width="24" stroke-linejoin="round" d="M256 52l164 60v124c0 104-68 184-164 228C160 420 92 340 92 236V112z"/>
+  <path fill="#FFFFFF" d="M210 150h92a60 60 0 0 1 60 60v30a60 60 0 0 1-60 60h-52l-48 38a6 6 0 0 1-10-5l8-36a60 60 0 0 1-50-57v-30a60 60 0 0 1 60-60z"/>
+  <circle cx="214" cy="225" r="14" fill="#F59E0B"/>
+  <circle cx="256" cy="225" r="14" fill="#F59E0B"/>
+  <circle cx="298" cy="225" r="14" fill="#F59E0B"/>
+</svg>

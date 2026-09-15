@@ -36,7 +36,7 @@ class NotificationService {
   Future<void> init() async {
     await _localNotifications.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('ic_stat_notification'),
+        android: AndroidInitializationSettings('ic_stat_mandu'),
       ),
       onDidReceiveNotificationResponse: (_) => _openHistory(),
     );
