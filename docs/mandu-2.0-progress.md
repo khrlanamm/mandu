@@ -22,6 +22,8 @@ adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk
 ```
 
 Data Emulator Suite tidak disimpan; setiap emulator dinyalakan ulang, jalankan seed lagi.
+Setiap kali menambah atau mengubah Cloud Functions, jalankan `npm --prefix functions run build`
+agar emulator memuat versi terbaru (kalau tidak, aplikasi menerima error `NOT_FOUND`).
 
 **Tes**
 - Backend + rules: `cd functions && npm run test:emulator` → **71 tes** (memakai port emulator terpisah `firebase.test.json`, aman berjalan bersama emulator dev).
