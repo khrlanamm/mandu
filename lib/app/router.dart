@@ -3,6 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/aspirasi/presentation/aspiration_hub_screen.dart';
+import '../features/care/presentation/conversation_screen.dart';
+import '../features/care/presentation/counselor_workspace_screen.dart';
+import '../features/care/presentation/curhat_list_screen.dart';
+import '../features/care/presentation/help_form_screen.dart';
+import '../features/care/presentation/help_hub_screen.dart';
+import '../features/care/presentation/staff_help_screen.dart';
+import '../features/care/presentation/start_curhat_screen.dart';
+import '../features/care/presentation/student_help_screen.dart';
 import '../features/aspirasi/presentation/public_aspiration_screen.dart';
 import '../features/aspirasi/presentation/staff_aspiration_inbox_screen.dart';
 import '../features/aspirasi/presentation/staff_aspiration_screen.dart';
@@ -93,6 +101,46 @@ GoRouter router(Ref ref) {
         builder: (context, state) => StaffTicketScreen(ticketId: state.pathParameters['ticketId']!),
       ),
       GoRoute(path: Routes.staffNotifications, builder: (context, state) => const NotificationsScreen()),
+      GoRoute(
+        path: Routes.studentHelp,
+        builder: (context, state) => const HelpHubScreen(),
+        routes: [
+          GoRoute(path: 'baru', builder: (context, state) => const HelpFormScreen()),
+          GoRoute(
+            path: ':requestId',
+            builder: (context, state) => StudentHelpScreen(requestId: state.pathParameters['requestId']!),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Routes.studentCurhat,
+        builder: (context, state) => const CurhatListScreen(),
+        routes: [
+          GoRoute(path: 'baru', builder: (context, state) => const StartCurhatScreen()),
+          GoRoute(
+            path: ':conversationId',
+            builder: (context, state) => ConversationScreen(
+              conversationId: state.pathParameters['conversationId']!,
+              asCounselor: false,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Routes.staffCare,
+        builder: (context, state) => const CounselorWorkspaceScreen(),
+      ),
+      GoRoute(
+        path: '/staff/bantuan/:requestId',
+        builder: (context, state) => StaffHelpScreen(requestId: state.pathParameters['requestId']!),
+      ),
+      GoRoute(
+        path: '/staff/curhat/:conversationId',
+        builder: (context, state) => ConversationScreen(
+          conversationId: state.pathParameters['conversationId']!,
+          asCounselor: true,
+        ),
+      ),
       GoRoute(
         path: Routes.studentAspirations,
         builder: (context, state) => const AspirationHubScreen(),

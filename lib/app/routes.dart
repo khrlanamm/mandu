@@ -17,6 +17,15 @@ abstract final class Routes {
   static const studentNotifications = '/home/notifikasi';
   static const studentAccount = '/home/akun';
   static const studentReport = '/home/lapor';
+  static const studentHelp = '/home/bantuan';
+  static const studentHelpForm = '/home/bantuan/baru';
+  static const studentCurhat = '/home/curhat';
+  static const studentCurhatStart = '/home/curhat/baru';
+
+  static String studentHelpDetail(String requestId) => '/home/bantuan/$requestId';
+
+  static String studentConversation(String conversationId) => '/home/curhat/$conversationId';
+
   static const studentAspirations = '/home/aspirasi';
   static const studentAspirationForm = '/home/aspirasi/baru';
 
@@ -34,6 +43,13 @@ abstract final class Routes {
   static const staffAccount = '/staff/akun';
   static const staffNotifications = '/staff/notifikasi';
   static const staffAspirations = '/staff/aspirasi';
+
+  /// Ruang kerja konselor (Butuh Bantuan + Curhat).
+  static const staffCare = '/staff/bk';
+
+  static String staffHelpDetail(String requestId) => '/staff/bantuan/$requestId';
+
+  static String staffConversation(String conversationId) => '/staff/curhat/$conversationId';
 
   static String staffAspiration(String id) => '/staff/aspirasi/$id';
 

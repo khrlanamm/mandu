@@ -10,6 +10,8 @@ import '../../../core/design/widgets/mandu_logo.dart';
 import '../../../core/design/widgets/states.dart';
 import '../../../core/domain/roles.dart';
 import '../../aspirasi/data/aspiration_repository.dart';
+import '../../care/data/care_repository.dart';
+import '../../care/domain/care.dart';
 import '../../aspirasi/domain/aspiration.dart';
 import '../../auth/application/session_controller.dart';
 import '../../lapor/data/ticket_repository.dart';
@@ -34,6 +36,11 @@ class StaffHomeScreen extends ConsumerWidget {
     final access = ref.watch(staffTicketAccessProvider);
     final tickets = ref.watch(staffTicketsProvider).value;
     final palette = context.palette;
+    final isCounselor = role == SchoolRole.konselor;
+    final waitingHelp = isCounselor
+        ? ref.watch(helpQueueProvider).value?.where((request) => request.status == HelpStatus.menunggu).length
+        : null;
+    final waitingCurhat = isCounselor ? ref.watch(waitingConversationsProvider).value?.length : null;
     final newAspirations = (access?.seesAll ?? false)
         ? ref.watch(aspirationInboxProvider(account.schoolId!)).value?.where((item) => item.status == AspirationStatus.diterima).length
         : null;
@@ -121,6 +128,34 @@ class StaffHomeScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
+                  if (isCounselor) ...[
+                    const SizedBox(height: Gaps.xl),
+                    const SectionHeader(title: 'Ruang konselor'),
+                    const SizedBox(height: Gaps.md),
+                    _ActionTile(
+                      icon: Icons.volunteer_activism_rounded,
+                      tone: palette.bantuan,
+                      title: 'Butuh Bantuan',
+                      subtitle: waitingHelp == null
+                          ? 'Memuat...'
+                          : waitingHelp == 0
+                              ? 'Tidak ada permintaan menunggu'
+                              : '$waitingHelp permintaan menunggu konselor',
+                      onTap: () => context.push(Routes.staffCare),
+                    ),
+                    const SizedBox(height: Gaps.md),
+                    _ActionTile(
+                      icon: Icons.forum_rounded,
+                      tone: palette.curhat,
+                      title: 'Curhat',
+                      subtitle: waitingCurhat == null
+                          ? 'Memuat...'
+                          : waitingCurhat == 0
+                              ? 'Semua percakapan sudah ada konselornya'
+                              : '$waitingCurhat percakapan menunggu konselor',
+                      onTap: () => context.push(Routes.staffCare),
+                    ),
+                  ],
                   if (access?.seesAll ?? false) ...[
                     const SizedBox(height: Gaps.xl),
                     const SectionHeader(title: 'Aspirasi'),

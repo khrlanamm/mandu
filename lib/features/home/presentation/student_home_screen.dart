@@ -33,6 +33,10 @@ class StudentHomeScreen extends ConsumerWidget {
         context.push(Routes.studentReport);
       case ManduService.aspirasi:
         context.push(Routes.studentAspirations);
+      case ManduService.curhat:
+        context.push(Routes.studentCurhat);
+      case ManduService.bantuan:
+        context.push(Routes.studentHelp);
       default:
         showSnack(context, 'Layanan ${service.label} sedang disiapkan.');
     }

@@ -13,6 +13,8 @@ import type {UserRecord} from "firebase-admin/auth";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import {syncClaims} from "../src/accounts/claims";
 import {ensureUserDoc} from "../src/accounts/users";
+import {claimConversation, startConversation} from "../src/care/conversations";
+import {claimHelp, requestHelp} from "../src/care/help";
 import {reviewAspiration, supportAspiration} from "../src/aspirations/review";
 import {submitAspiration, submitPublicAspiration} from "../src/aspirations/submit";
 import {readClaims, type Caller} from "../src/core/claims";
@@ -281,6 +283,45 @@ async function ensureSampleAspirations(schoolId: string, code: string, domain: s
   return 3;
 }
 
+/** Contoh Butuh Bantuan dan Curhat untuk demo dan manual penggunaan. */
+async function ensureSampleCare(schoolId: string, domain: string): Promise<number> {
+  const existing = await db().collection("schools").doc(schoolId).collection("helpRequests").limit(1).get();
+  if (!existing.empty) return 0;
+
+  const [bk, siswa, siswa2] = await Promise.all(["bk", "siswa", "siswa2"].map((name) => callerFor(`${name}@${domain}`)));
+
+  // Permintaan yang sudah diambil konselor dan berlanjut ke percakapan.
+  const handled = await requestHelp(siswa2, {
+    schoolId,
+    needs: ["ingin_bicara", "perasaan"],
+    urgency: "segera",
+    contactMethod: "chat",
+    contactTime: "istirahat",
+    note: "Akhir-akhir ini sulit tidur dan tidak fokus belajar.",
+  });
+  await claimHelp(bk, {schoolId, requestId: handled.requestId});
+
+  // Permintaan baru yang masih menunggu konselor.
+  await requestHelp(siswa, {
+    schoolId,
+    needs: ["teman", "belum_siap"],
+    urgency: "biasa",
+    contactMethod: "bertemu",
+    contactTime: "pulang_sekolah",
+  });
+
+  // Curhat dengan nama samaran yang sudah diambil konselor.
+  const alias = await startConversation(siswa, {
+    schoolId,
+    counselorUid: null,
+    alias: "Langit",
+    topic: "Pertemanan",
+    message: "Bu, saya sering merasa dijauhi teman sekelas. Saya tidak tahu harus bagaimana.",
+  });
+  await claimConversation(bk, {schoolId, conversationId: alias.conversationId});
+  return 3;
+}
+
 async function main(): Promise<void> {
   assertSafeTarget();
 
@@ -307,6 +348,7 @@ async function main(): Promise<void> {
   await ensureNisnStudent(school, "0059990001", "Dewi Lestari", "X-2");
   const sampleTickets = await ensureSampleTickets(school.id, domain);
   const sampleAspirations = await ensureSampleAspirations(school.id, code, domain);
+  const sampleCare = await ensureSampleCare(school.id, domain);
 
   if (!production) {
     const secondName = "SMP Harapan Bangsa";
@@ -316,6 +358,7 @@ async function main(): Promise<void> {
 
   console.log(`\nData uji coba siap (${production ? "PRODUKSI" : "emulator"}). Password: ${production ? "(sesuai --password)" : password}`);
   console.table(summary);
+  console.log(sampleCare ? `${sampleCare} contoh permintaan bantuan & curhat dibuat.` : "Contoh bantuan & curhat sudah ada, dilewati.");
   console.log(sampleAspirations ? `${sampleAspirations} contoh aspirasi dibuat.` : "Contoh aspirasi sudah ada, dilewati.");
   console.log(sampleTickets ? `${sampleTickets} contoh laporan dibuat di ${name}.` : `Contoh laporan di ${name} sudah ada, dilewati.`);
 }
