@@ -1,0 +1,6 @@
+# Salin menjadi android/key.properties (sudah di-.gitignore) lalu isi passwordnya.
+# storeFile boleh path absolut; simpan keystore DI LUAR repo.
+storeFile=/Users/benevology/StudioProjects/MyKeyStore/mandu_keystore.jks
+storePassword=
+keyAlias=mandu-key
+keyPassword=

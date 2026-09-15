@@ -1,0 +1,57 @@
+rules_version = '2';
+
+// Deploy: firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function validNewReport(data) {
+      return data.keys().hasOnly([
+          'id', 'userId', 'peran', 'tanggalBullying', 'lokasi', 'frekuensi',
+          'deskripsi', 'nomorWhatsapp', 'urlBukti', 'timestamp', 'status'
+        ])
+        && data.userId == request.auth.uid
+        && data.status == 'terlapor'
+        && data.peran in ['Korban', 'Saksi']
+        && data.tanggalBullying is string && data.tanggalBullying.size() <= 20
+        && data.lokasi is string && data.lokasi.size() <= 500
+        && data.frekuensi is string && data.frekuensi.size() <= 50
+        && data.deskripsi is string && data.deskripsi.size() <= 5000
+        && data.nomorWhatsapp is string && data.nomorWhatsapp.size() <= 20
+        && (data.get('urlBukti', null) == null || data.urlBukti is string)
+        && data.timestamp is timestamp;
+    }
+
+    // Artikel edukasi: dibaca pengguna yang login, dikelola lewat Firebase console.
+    match /articles/{articleId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Daftar admin dikelola lewat Firebase console. Admin hanya boleh
+    // memperbarui fcmToken miliknya sendiri.
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fcmToken']);
+    }
+
+    // Laporan bullying berisi data sensitif: hanya pelapor dan admin yang boleh membaca.
+    match /reports/{reportId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      allow create: if signedIn() && validNewReport(request.resource.data);
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['terlapor', 'ditangani'];
+      allow delete: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && resource.data.status == 'terlapor';
+    }
+  }
+}
