@@ -10,9 +10,10 @@
  *     npx tsx scripts/seed.ts --production --password '<password-kuat-min-12>'
  */
 import type {UserRecord} from "firebase-admin/auth";
-import {FieldValue} from "firebase-admin/firestore";
+import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import {syncClaims} from "../src/accounts/claims";
 import {ensureUserDoc} from "../src/accounts/users";
+import {readClaims, type Caller} from "../src/core/claims";
 import {auth, db} from "../src/core/firebase";
 import {nisnEmail} from "../src/core/ids";
 import {CONSENT_VERSION} from "../src/domain/catalog";
@@ -21,6 +22,8 @@ import {joinSchool} from "../src/members/join";
 import {reviewMembers} from "../src/members/review";
 import {importStudents} from "../src/members/students";
 import {createSchool} from "../src/schools/manage";
+import {submitTicket} from "../src/tickets/submit";
+import {addTicketProgress, rateTicket, resolveTicket, verifyTicket} from "../src/tickets/workflow";
 
 const args = process.argv.slice(2);
 const production = args.includes("--production");
@@ -120,6 +123,117 @@ async function ensureNisnStudent(school: {id: string; name: string; code: string
   summary.push({sekolah: school.name, peran: "siswa akun NISN (wajib ganti password)", login: `kode ${school.code} · NISN ${nisn}`});
 }
 
+async function callerFor(email: string): Promise<Caller> {
+  const record = await auth().getUserByEmail(email);
+  return {uid: record.uid, claims: readClaims(record.customClaims ?? {})};
+}
+
+let ticketSequence = 0;
+const seedTicketId = () => `seed${Date.now().toString(36)}${ticketSequence++}`.padEnd(20, "0");
+const daysAgo = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+
+/** Contoh laporan di setiap status, dibuat lewat alur yang sama dengan aplikasi. Dilewati bila sekolah sudah punya laporan. */
+async function ensureSampleTickets(schoolId: string, domain: string): Promise<number> {
+  const existing = await db().collection("schools").doc(schoolId).collection("tickets").limit(1).get();
+  if (!existing.empty) return 0;
+
+  const [admin, bk, sarpras, kurikulum, siswa, siswa2] = await Promise.all(
+    ["admin", "bk", "sarpras", "kurikulum", "siswa", "siswa2"].map((name) => callerFor(`${name}@${domain}`)),
+  );
+  const report = (caller: Caller, input: Record<string, unknown>) =>
+    submitTicket(caller, {schoolId, ticketId: seedTicketId(), anonymous: false, attachments: [], ...input});
+
+  const chairs = await report(siswa, {
+    category: "fasilitas",
+    subcategory: "perabot",
+    title: "Tiga kursi kelas XI IPA 1 patah",
+    description: "Kaki kursi di barisan belakang patah dan kemarin ada teman yang hampir jatuh.",
+    location: "Kelas XI IPA 1",
+    incidentDate: daysAgo(4),
+  });
+  await verifyTicket(admin, {schoolId, ticketId: chairs.ticketId, decision: "forward", message: "Terima kasih, segera kami tangani."});
+  await addTicketProgress(sarpras, {schoolId, ticketId: chairs.ticketId, message: "Kursi pengganti sudah diambil dari gudang."});
+  await resolveTicket(sarpras, {
+    schoolId,
+    ticketId: chairs.ticketId,
+    note: "Tiga kursi sudah diganti dengan yang baru dan kursi lain di kelas sudah dicek satu per satu.",
+  });
+  await rateTicket(siswa, {schoolId, ticketId: chairs.ticketId, score: 5, comment: "Cepat ditangani, terima kasih!"});
+
+  const bullying = await report(siswa2, {
+    category: "keamanan",
+    subcategory: "perundungan_siber",
+    anonymous: true,
+    title: "Diejek terus di grup WhatsApp kelas",
+    description: "Sudah dua minggu beberapa teman mengirim stiker dan foto editan untuk mengejek saya di grup kelas.",
+    location: "Grup WhatsApp kelas X-2",
+    incidentDate: daysAgo(2),
+    details: {role: "korban", frequency: "Terus berulang"},
+  });
+  await verifyTicket(bk, {schoolId, ticketId: bullying.ticketId, decision: "forward"});
+  await addTicketProgress(bk, {
+    schoolId,
+    ticketId: bullying.ticketId,
+    message: "Guru BK sudah berkoordinasi dengan wali kelas X-2 dan menjadwalkan pertemuan dengan pihak terkait.",
+  });
+  await addTicketProgress(bk, {
+    schoolId,
+    ticketId: bullying.ticketId,
+    visibility: "internal",
+    message: "Tiga siswa terlibat sudah teridentifikasi dari tangkapan layar. Pemanggilan orang tua hari Kamis.",
+  });
+
+  const toilet = await report(siswa, {
+    category: "kebersihan",
+    subcategory: "toilet",
+    title: "Toilet putra lantai 2 tidak ada air",
+    description: "Sejak Senin keran di toilet putra lantai 2 tidak mengalir, toilet jadi bau dan tidak bisa dipakai.",
+    location: "Toilet putra lantai 2",
+  });
+  await db().collection("schools").doc(schoolId).collection("tickets").doc(toilet.ticketId).update({
+    "sla.verifyDueAt": Timestamp.fromMillis(Date.now() - 3 * 3_600_000),
+  });
+
+  const emptyClass = await report(siswa2, {
+    category: "pembelajaran",
+    subcategory: "jam_kosong",
+    title: "Jam pelajaran Matematika sering kosong",
+    description: "Beberapa minggu terakhir pelajaran Matematika sering kosong tanpa tugas pengganti.",
+    location: "Kelas X-2",
+  });
+  await verifyTicket(kurikulum, {
+    schoolId,
+    ticketId: emptyClass.ticketId,
+    decision: "request_info",
+    message: "Mohon sebutkan hari atau tanggal jam kosong terjadi agar bisa kami cocokkan dengan jadwal guru.",
+  });
+
+  const canteen = await report(siswa, {
+    category: "kebersihan",
+    subcategory: "kantin",
+    title: "Harga jajanan kantin naik",
+    description: "Harga gorengan di kantin naik dari seribu menjadi dua ribu rupiah sejak minggu lalu.",
+    location: "Kantin sekolah",
+  });
+  await verifyTicket(admin, {
+    schoolId,
+    ticketId: canteen.ticketId,
+    decision: "reject",
+    reason: "bukan_wewenang",
+    message: "Harga ditentukan pengelola kantin. Silakan sampaikan lewat Aspirasi agar dibahas bersama OSIS.",
+  });
+
+  await report(siswa2, {
+    category: "keamanan",
+    subcategory: "ancaman_keamanan",
+    anonymous: true,
+    title: "Kakak kelas membawa pisau lipat",
+    description: "Saya melihat kakak kelas membawa pisau lipat di tas dan mengancam akan memakainya sepulang sekolah.",
+    location: "Parkiran motor belakang",
+  });
+  return 6;
+}
+
 async function main(): Promise<void> {
   assertSafeTarget();
 
@@ -144,6 +258,7 @@ async function main(): Promise<void> {
   await ensureStudent(school, `siswa2@${domain}`, "Siti Aminah", "X-2", {nisn: "0052222222", approve: true, consent: true});
   await ensureStudent(school, production ? `calon@${domain}` : "calon.siswa@mandu.test", "Rina Pratiwi", "X-1", {approve: false, consent: false});
   await ensureNisnStudent(school, "0059990001", "Dewi Lestari", "X-2");
+  const sampleTickets = await ensureSampleTickets(school.id, domain);
 
   if (!production) {
     const secondName = "SMP Harapan Bangsa";
@@ -153,6 +268,7 @@ async function main(): Promise<void> {
 
   console.log(`\nData uji coba siap (${production ? "PRODUKSI" : "emulator"}). Password: ${production ? "(sesuai --password)" : password}`);
   console.table(summary);
+  console.log(sampleTickets ? `${sampleTickets} contoh laporan dibuat di ${name}.` : `Contoh laporan di ${name} sudah ada, dilewati.`);
 }
 
 main().then(

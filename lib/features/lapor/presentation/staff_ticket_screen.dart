@@ -120,14 +120,19 @@ class _ActionBar extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.all(Gaps.md),
-          child: ContentWidth(
-            child: Row(
-              children: [
-                for (var index = 0; index < actions.length; index++) ...[
-                  if (index > 0) const SizedBox(width: Gaps.sm),
-                  Expanded(child: actions[index]),
+          // heightFactor 1: bottomNavigationBar mendapat tinggi layar penuh sebagai batas.
+          child: Align(
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+              child: Row(
+                children: [
+                  for (var index = 0; index < actions.length; index++) ...[
+                    if (index > 0) const SizedBox(width: Gaps.sm),
+                    Expanded(child: actions[index]),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),
