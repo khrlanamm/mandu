@@ -29,7 +29,7 @@
   h1, h2, h3, h4 { color: var(--navy); line-height: 1.25; }
   h1 { font-size: 26pt; margin: 0 0 6pt; letter-spacing: -0.5pt; }
   h2 { font-size: 16pt; margin: 0 0 10pt; padding-bottom: 6pt; border-bottom: 2px solid var(--blue-soft); }
-  h3 { font-size: 12.5pt; margin: 16pt 0 4pt; }
+  h3 { font-size: 12.5pt; margin: 12pt 0 4pt; }
   h4 { font-size: 11pt; margin: 12pt 0 3pt; }
   p, li { margin: 0 0 6pt; }
   ol, ul { padding-left: 16pt; margin: 0 0 8pt; }
@@ -58,7 +58,7 @@
   .tip { border-left-color: var(--curhat); background: #EEF9F7; }
   .note b, .warn b, .tip b { color: var(--navy); }
 
-  figure { margin: 10pt 0 14pt; page-break-inside: avoid; }
+  figure { margin: 8pt 0 10pt; page-break-inside: avoid; }
   figure img { width: 62mm; border: 1px solid var(--line); border-radius: 8pt; display: block; }
   figure.wide img { width: 120mm; }
   figcaption { font-size: 9pt; color: var(--muted); margin-top: 4pt; }
@@ -75,7 +75,8 @@
   .toc ol { list-style: none; padding: 0; }
   .toc li { border-bottom: 1px dotted var(--line); padding: 4pt 0; }
   .steps { counter-reset: step; list-style: none; padding: 0; }
-  .steps > li { counter-increment: step; position: relative; padding-left: 22pt; margin-bottom: 7pt; }
+  .steps > li { counter-increment: step; position: relative; padding-left: 22pt; margin-bottom: 5pt; }
+  .subsection { page-break-inside: avoid; }
   .steps > li::before {
     content: counter(step); position: absolute; left: 0; top: 1pt;
     width: 15pt; height: 15pt; border-radius: 50%; background: var(--blue); color: #fff;
@@ -232,7 +233,7 @@
     <li>Pilih <b>kategori</b> yang paling sesuai, lalu pilih <b>jenis masalah</b>.</li>
     <li>Isi <b>judul singkat</b>, <b>cerita kejadian</b>, dan <b>lokasi</b>. Tanggal dan jam kejadian membantu sekolah menelusuri.</li>
     <li>Untuk kategori Keamanan &amp; Perlindungan, ada isian tambahan: peranmu (korban/saksi), seberapa sering, dan pihak yang terlibat. Semuanya boleh dikosongkan.</li>
-    <li>Lampirkan <b>foto atau PDF</b> (maksimal 5 berkas, masing-masing 10 MB) bila ada bukti.</li>
+    <li>Lampirkan <b>foto atau PDF</b> (maksimal 5 berkas, masing-masing 10 MB) bila ada bukti. Nomor <b>WhatsApp</b> juga boleh diisi (opsional) bila sekolah perlu menghubungimu langsung.</li>
     <li>Atur <b>“Rahasiakan identitasku”</b>. Untuk laporan keamanan, pilihan ini menyala otomatis.</li>
     <li>Ketuk <b>Kirim laporan</b>, lalu konfirmasi. Kamu akan menerima nomor laporan, misalnya <code>MND-2026-0007</code>.</li>
   </ol>
@@ -331,7 +332,7 @@
     </li>
     <li>Setelah diteruskan, kamu masih bisa <b>Alihkan unit</b> atau menambahkan <b>Catatan internal</b> lewat menu ⋮.</li>
   </ol>
-  <figure class="wide"><img src="img/staf-verifikasi-sheet.png" alt="Formulir verifikasi"><figcaption>Formulir “Verifikasi &amp; teruskan”.</figcaption></figure>
+  <figure><img src="img/staf-verifikasi-sheet.png" alt="Formulir verifikasi"><figcaption>Formulir “Verifikasi &amp; teruskan”.</figcaption></figure>
 </section>
 
 <section class="page">
@@ -349,7 +350,8 @@
 
 <section class="page">
   <h2>12. Panduan Guru BK</h2>
-  <figure class="wide"><img src="img/konselor-ruang.png" alt="Ruang konselor"><figcaption>Ruang konselor: antrean Butuh Bantuan dan percakapan Curhat.</figcaption></figure>
+  <figure><img src="img/konselor-ruang.png" alt="Ruang konselor"><figcaption>Ruang konselor: antrean Butuh Bantuan dan percakapan Curhat.</figcaption></figure>
+  <div class="subsection">
   <h3>Butuh Bantuan</h3>
   <ol class="steps">
     <li>Buka <b>Beranda → Ruang konselor → tab Butuh Bantuan</b>.</li>
@@ -357,6 +359,8 @@
     <li>Ketuk <b>Ambil permintaan ini</b>. Bila siswa memilih chat, percakapan otomatis dibuka dengan pesan pembuka.</li>
     <li>Setelah pendampingan selesai, ketuk <b>Tutup</b> dan tulis pesan penutup untuk siswa.</li>
   </ol>
+  </div>
+  <div class="subsection">
   <h3>Curhat</h3>
   <ol class="steps">
     <li>Tab <b>Curhat</b> memuat percakapan yang menunggu konselor dan percakapan milikmu.</li>
@@ -364,6 +368,7 @@
     <li>Menu ⋮ menyediakan <b>Catatan kasus</b> (privat, dengan penanda risiko) dan <b>Usulkan jadwal temu</b>.</li>
     <li>Bila siswa memakai nama samaran, identitas hanya terlihat setelah siswa membukanya sendiri.</li>
   </ol>
+  </div>
   <div class="warn"><b>Kerahasiaan.</b> Admin sekolah dan pimpinan tidak dapat membaca isi Curhat maupun permintaan bantuan.
   Dashboard hanya menampilkan jumlahnya.</div>
 </section>
@@ -398,7 +403,7 @@
 
 <section class="page">
   <h2>14. Dashboard sekolah</h2>
-  <figure class="wide"><img src="img/dashboard.png" alt="Dashboard sekolah"><figcaption>Dashboard: ringkasan, tren bulanan, kategori, dan kinerja unit.</figcaption></figure>
+  <figure><img src="img/dashboard.png" alt="Dashboard sekolah"><figcaption>Dashboard: ringkasan, tren bulanan, kategori, dan kinerja unit.</figcaption></figure>
   <ol class="steps">
     <li>Buka <b>Beranda → Dashboard</b> (tersedia untuk admin, pimpinan, dan Tim Verifikasi). Dari laptop,
     buka <a href="https://teman-ngadu.web.app">teman-ngadu.web.app</a> lalu masuk dengan akun yang sama.</li>
