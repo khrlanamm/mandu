@@ -115,9 +115,16 @@ GOOGLE_APPLICATION_CREDENTIALS=~/.config/mandu/service-account.json GCLOUD_PROJE
   npx tsx scripts/migrate.ts --school-code SMANDI --apply --production
 ```
 
-Hasil uji di emulator: 3 laporan lama → 1 tiket menunggu verifikasi + 2 tiket selesai (identitas pelapor
-dirahasiakan, bukti lama tetap terbaca lewat path Storage), 3 artikel lama diberi `published`,
-2 superadmin dan 2 admin sekolah dibuat, pelapor lama menjadi anggota siswa aktif.
+Hasil uji di emulator (diperiksa langsung isi Firestore-nya):
+- 3 laporan lama → `MND-2026-0001` (menunggu verifikasi) dan dua tiket **selesai** di unit `bk_ppks`;
+  semuanya `anonymous: true` dengan `reporter: null`, dan bukti lama terbawa sebagai path Storage
+  (`laporan_bukti/bukti1.jpg`) sehingga tetap bisa dibuka lewat rules lama.
+- Artikel lama tanpa isi panjang menjadi tipe **tautan** dan mendapat `published: true`.
+- Anggota terbentuk: 2 admin sekolah (`admin-sekolah-1@`, `admin-sekolah-2@`) dan 2 siswa pelapor lama;
+  2 akun superadmin diberi klaim `sa`.
+- Dijalankan dua kali: laporan kedua melaporkan "tiket/artikel sudah dimigrasi" (idempoten).
+
+Catatan: nomor tiket mengikuti tahun laporan aslinya, jadi di produksi laporan 2025 menjadi `MND-2025-xxxx`.
 
 ## Berikutnya
 - **Manual book PDF** penggunaan aplikasi + dashboard memakai akun uji coba.
