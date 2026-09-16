@@ -94,7 +94,7 @@
   <p class="sub">Media Aspirasi, Notifikasi, dan Dukungan Siswa — “Teman Mengadu, Sekolah Berbenah”.
   Panduan lengkap untuk siswa, guru BK, petugas unit, admin sekolah, pimpinan, dan superadmin.</p>
   <div class="meta">
-    <div><b>Versi aplikasi:</b> 4.0.0 (MANDU 2.0)</div>
+    <div><b>Versi aplikasi:</b> MANDU 2.0</div>
     <div><b>Dokumen:</b> panduan penggunaan dengan akun uji coba</div>
     <div><b>Tanggal:</b> 16 September 2026</div>
   </div>
@@ -167,8 +167,8 @@
   sungguhan, tersedia <b>SMA Negeri Demo MANDU</b> dengan kode gabung <code>DEMO01</code>.</p>
 
   <h3>Akun di aplikasi produksi</h3>
-  <p>Aplikasi Android dan dashboard web <a href="https://teman-ngadu.web.app">teman-ngadu.web.app</a> memakai
-  akun berikut. Semua memakai kata sandi <code>[disimpan di Play Console > App access]</code> dan masuk lewat menu
+  <p>Aplikasi MANDU di ponsel dan tampilan web <a href="https://teman-ngadu.web.app">teman-ngadu.web.app</a>
+  memakai akun berikut. Semua memakai kata sandi <code>[disimpan di Play Console > App access]</code> dan masuk lewat menu
   <b>“Staf sekolah? Masuk dengan email”</b>.</p>
   <table>
     <tr><th style="width:30%">Peran</th><th>Akun</th><th style="width:32%">Dipakai untuk mencoba</th></tr>
@@ -192,10 +192,6 @@
   sampai selesai dan dinilai), 3 aspirasi (termasuk satu dari tamu tanpa login), 2 permintaan Butuh Bantuan,
   1 percakapan Curhat, dan 4 konten Edukasi.</p>
 
-  <h3>Untuk pengembang: akun di Firebase Emulator Suite</h3>
-  <p>Saat menjalankan aplikasi dengan Emulator Suite (<code>npm run seed:emulator</code>), akun yang sama
-  tersedia dengan kata sandi <code>mandu123</code>, ditambah <code>superadmin@mandu.test</code> dan sekolah
-  kedua <b>SMP Harapan Bangsa</b> (kode <code>HARAPAN</code>) untuk menguji pemisahan data antar sekolah.</p>
 </section>
 
 <section class="page">
@@ -387,7 +383,7 @@
     <li><b>Kode gabung dan QR</b> — bagikan atau ganti bila bocor.</li>
     <li><b>Layanan aktif</b> — nyalakan/matikan Lapor, Curhat, Aspirasi, Butuh Bantuan, Edukasi.</li>
     <li><b>Aspirasi tanpa login</b> dan <b>papan aspirasi</b>.</li>
-    <li><b>Target waktu (SLA)</b> verifikasi, tindak lanjut, dan laporan darurat.</li>
+    <li><b>Target waktu </b> verifikasi, tindak lanjut, dan laporan darurat.</li>
   </ul>
   <h3>Aspirasi dan Edukasi</h3>
   <ul>
@@ -405,7 +401,7 @@
     <li>Baca kartu ringkas: total laporan, selesai, sedang diproses, menunggu verifikasi, dan lewat batas waktu.</li>
     <li>Periksa <b>rata-rata waktu verifikasi dan penyelesaian</b>, serta <b>kepuasan pelapor</b>.</li>
     <li>Telusuri <b>tren bulanan</b>, <b>komposisi kategori</b>, <b>kinerja tiap unit</b> (termasuk persentase tepat waktu), dan <b>lokasi yang sering dilaporkan</b>.</li>
-    <li>Ketuk ikon unduh untuk <b>ekspor CSV</b> yang bisa dibuka di Excel atau Google Sheets.</li>
+    <li>Ketuk ikon unduh untuk <b>unduh rekap</b> yang bisa dibuka di Excel atau Google Sheets.</li>
   </ol>
   <div class="note"><b>Untuk evaluasi.</b> Bagian “Layanan lain” menampilkan jumlah aspirasi, permintaan bantuan, dan percakapan
   curhat — tanpa isi percakapan — agar sekolah tetap dapat mengukur beban layanan.</div>
@@ -449,8 +445,9 @@
     <tr><td>Aspirasi di papan</td><td>Siswa sekolah tersebut, tanpa nama pengirim</td></tr>
     <tr><td>Dashboard</td><td>Angka saja; isi percakapan tidak pernah ditampilkan</td></tr>
   </table>
-  <p>Semua perubahan data penting dilakukan lewat server (Cloud Functions) dan dilindungi aturan keamanan Firebase,
-  sehingga aplikasi tidak bisa mengubah status laporan atau membaca data yang bukan haknya.</p>
+  <p>Setiap perubahan penting — misalnya mengubah status laporan — diproses di server MANDU, bukan di ponsel.
+  Karena itu tidak ada pengguna yang bisa mengubah status laporan orang lain atau membuka data yang bukan haknya,
+  sekalipun ia mencoba mengakalinya.</p>
 </section>
 
 <section class="page">
