@@ -151,19 +151,36 @@ Sudah dikerjakan:
     "Budi Santoso · SMA Negeri Demo MANDU · siswa · aktif"; `schools-lookup` dan aspirasi tamu berhasil (ASP-2026-0004);
   - lewat aplikasi rilis di emulator Android: masuk, beranda, dan daftar laporan tampil dari data produksi.
 
-Berikutnya:
-- Build AAB versionName 4.0.0 dan unggah ke Play Console (dikerjakan sesuai aba-aba user).
-- Aktifkan App Check setelah rilis pertama stabil.
+### Tahap 7 — Rilis Play Store (selesai, menunggu tinjauan Google)
 
-## Berikutnya
-- **Manual book PDF** penggunaan aplikasi + dashboard memakai akun uji coba.
-- **Tahap 7 — Rilis**
-  - Migrasi produksi: 44 laporan → tiket, 50 artikel (**wajib menambahkan field `published: true`**), superadmin & admin sekolah.
-  - Seed "Sekolah Uji Coba MANDU" di produksi.
-  - Deploy functions, rules, dan indexes; aktifkan App Check.
-  - Build AAB versionName 4.0.0 (versionCode ≥ 13) dan unggah ke Play Console — **dikerjakan belakangan sesuai permintaan user**.
+Listingan Play Store dirombak total supaya sesuai MANDU 2.0 (sebelumnya masih punya identitas
+aplikasi 4.0.0 lama — maskot, warna tosca, deskripsi "Laporkan Bullying"):
+
+- **Halaman publik baru** di `teman-ngadu.web.app`: `kebijakan-privasi.html` (naskah baru, mencakup
+  kelima layanan dan aturan kerahasiaan) dan `hapus-akun.html` (cara sungguhan meminta penghapusan
+  akun lewat admin sekolah — bukan tombol di aplikasi, karena fitur itu memang belum ada).
+- **Aset toko** (`store/`, dibuat ulang dengan `tool/store/generate.py`): ikon 512×512, gambar fitur
+  1024×500, dan 8 screenshot promosi (ponsel + tablet 7"/10") — gradasi biru MANDU + judul + bingkai
+  HP berisi tangkapan layar asli dari build rilis melawan data produksi.
+- **Naskah listing** (`docs/play-store-listing.md`): nama "MANDU Lapor & Aspirasi Sekolah" (30/30),
+  deskripsi singkat & lengkap ditulis ulang untuk lima layanan dan multi-sekolah.
+- **Konten aplikasi**: URL kebijakan privasi diperbarui; Detail login diganti dari placeholder
+  "Google Sign-In Access" jadi dua akun sungguhan (siswa & admin demo); Keamanan Data diisi ulang
+  (menambahkan login email/sandi, file/dokumen, tautan hapus akun); Rating Konten dikirim ulang
+  (dapat USK 16 karena fitur pesan Curhat/Aspirasi antar pengguna — wajar untuk aplikasi berfitur chat).
+- **Manifest Android**: izin `AD_ID`/`ADSERVICES_AD_ID`/`ADSERVICES_ATTRIBUTION` yang otomatis
+  ditambahkan `firebase_analytics` dibuang (`tools:node="remove"`) karena MANDU tidak memakai iklan.
+- **AAB dibangun & diunggah**: `flutter build appbundle --release`, versionName 4.0.0 versionCode 13,
+  79,9 MB (terlalu besar untuk upload otomatis lewat automasi browser — user mengunggah manual).
+- **Dikirim untuk ditinjau** (16 September 2026): 12 perubahan sekaligus (listing, kebijakan privasi,
+  keamanan data, rating konten, rilis produksi) dengan peluncuran 100%. Status: **dalam peninjauan Google**.
+
+Berikutnya (setelah lolos tinjauan):
+- Aktifkan App Check.
+- Pertimbangkan mencabut/merotasi kunci service account di `~/.config/mandu/` yang dipakai untuk
+  skrip seed/cleanup produksi, karena sudah tidak diperlukan rutin.
 
 ## Catatan keamanan
 - Password keystore hanya di `android/key.properties` (gitignored); service account di `~/.config/mandu/`.
-- Produksi masih memakai functions dan rules aplikasi 4.0.0. Kode MANDU 2.0 belum di-deploy.
+- Produksi memakai functions, rules, dan seluruh kode MANDU 2.0 (bukan lagi aplikasi 4.0.0 lama).
 - Pengujian notifikasi push dilakukan user di perangkat nyata (bukan di emulator).

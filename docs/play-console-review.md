@@ -3,6 +3,10 @@
 Salin isi bagian ini ke **Play Console → App content → App access** dan kolom catatan peninjau saat
 mengunggah rilis MANDU.
 
+> **Status:** sudah dimasukkan ke Play Console sebagai dua entri Detail login ("Student demo
+> account" dan "School admin demo account") dan dikirim bersama rilis 4.0.0 (13) untuk ditinjau
+> pada 16 September 2026.
+
 ## Akun uji coba (App access)
 
 Aplikasi memerlukan akun sekolah. Gunakan akun demo berikut — akun ini terhubung ke sekolah demo
@@ -46,11 +50,15 @@ Aplikasi menampilkan peringatan bahwa MANDU bukan layanan darurat, beserta nomor
 
 ## Data safety (ringkas)
 
-- **Dikumpulkan:** nama, email atau NISN, sekolah dan kelas, isi laporan/aspirasi/percakapan, lampiran yang diunggah pengguna, token notifikasi perangkat.
+- **Dikumpulkan:** nama, email atau NISN, nomor telepon (opsional), sekolah dan kelas, isi
+  laporan/aspirasi/percakapan, foto dan dokumen (PDF) yang diunggah pengguna, log error aplikasi,
+  token notifikasi perangkat.
 - **Tujuan:** menjalankan layanan pengaduan dan konseling sekolah.
 - **Dibagikan ke pihak ketiga:** tidak. Data hanya diproses di Firebase milik penyelenggara.
 - **Dienkripsi saat transit:** ya (HTTPS/TLS).
-- **Penghapusan akun:** pengguna dapat meminta penghapusan lewat admin sekolah, dan halaman
-  [teman-ngadu.web.app](https://teman-ngadu.web.app) menyediakan informasi kebijakan privasi serta cara menghapus akun.
+- **Kebijakan privasi:** [teman-ngadu.web.app/kebijakan-privasi.html](https://teman-ngadu.web.app/kebijakan-privasi.html)
+- **Penghapusan akun:** pengguna meminta lewat admin sekolah (yang mengeluarkannya dari menu Kelola
+  Anggota) atau email `temenngadu@gmail.com`; langkahnya ada di
+  [teman-ngadu.web.app/hapus-akun.html](https://teman-ngadu.web.app/hapus-akun.html).
 - **Konten anak:** aplikasi ditujukan untuk siswa sekolah; saat onboarding pengguna menyatakan bahwa orang
   tua/wali mengetahui penggunaan aplikasi bila pengguna berusia di bawah 18 tahun.
