@@ -21,6 +21,14 @@ import {ensureUserDoc} from "../src/accounts/users";
 import {auth, db} from "../src/core/firebase";
 import {schoolCodeRef, schoolRef} from "../src/core/refs";
 import {REPORT_CATEGORIES} from "../src/domain/catalog";
+import {
+  articleTypeFromLegacy,
+  legacyTicketNumber,
+  roleFromLegacy,
+  statusFromLegacy,
+  storagePathFromUrl,
+  titleFromDescription,
+} from "../src/migration/legacy";
 import type {MemberDoc} from "../src/domain/models";
 import type {Attachment, TicketDoc, TimelineDoc} from "../src/domain/tickets";
 import {createSchool} from "../src/schools/manage";
@@ -56,26 +64,6 @@ function assertSafeTarget(): void {
   if (!production && emulator.some((host) => !host)) {
     throw new Error("Tanpa --production, skrip hanya boleh dijalankan terhadap Emulator Suite.");
   }
-}
-
-/** Ambil path Storage dari URL unduhan Firebase (…/o/laporan_bukti%2Ffile.jpg?alt=…). */
-export function storagePathFromUrl(url: string | undefined | null): string | null {
-  if (!url) return null;
-  const match = /\/o\/([^?]+)/.exec(url);
-  return match ? decodeURIComponent(match[1]) : null;
-}
-
-/** Jadikan teks laporan lama sebagai judul singkat (maksimal 120 karakter). */
-export function titleFromDescription(description: string): string {
-  const firstSentence = description.trim().split(/[.\n]/)[0]?.trim() ?? "";
-  const source = firstSentence.length >= 10 ? firstSentence : description.trim();
-  const title = source.slice(0, 117);
-  return (title.length < source.length ? `${title}...` : title) || "Laporan perundungan";
-}
-
-/** Status laporan lama → status tiket MANDU 2.0. */
-export function statusFromLegacy(status: string | undefined): TicketDoc["status"] {
-  return status === "ditangani" ? "selesai" : "menunggu_verifikasi";
 }
 
 const jakartaYear = (date: Date) => new Intl.DateTimeFormat("en", {timeZone: "Asia/Jakarta", year: "numeric"}).format(date);
@@ -152,7 +140,8 @@ async function migrateReports(schoolId: string): Promise<void> {
   for (const doc of snapshot.docs) {
     const legacy = doc.data() as Record<string, unknown>;
     const ticketRef = schoolRef(schoolId).collection("tickets").doc(doc.id);
-    if (apply && (await ticketRef.get()).exists) {
+    // Dicek juga saat dry-run supaya ringkasan sebelum produksi menggambarkan keadaan sebenarnya.
+    if ((await ticketRef.get()).exists) {
       count("tiket sudah dimigrasi");
       continue;
     }
@@ -169,7 +158,7 @@ async function migrateReports(schoolId: string): Promise<void> {
 
     const ticket: TicketDoc & {legacyId: string} = {
       legacyId: doc.id,
-      number: `MND-${jakartaYear(createdAt.toDate())}-${String(sequence).padStart(4, "0")}`,
+      number: legacyTicketNumber(jakartaYear(createdAt.toDate()), sequence),
       schoolId,
       category: category.key,
       categoryLabel: category.label,
@@ -181,7 +170,7 @@ async function migrateReports(schoolId: string): Promise<void> {
       incidentDate: typeof legacy.tanggalBullying === "string" ? legacy.tanggalBullying : null,
       incidentTime: null,
       details: {
-        role: legacy.peran === "korban" || legacy.peran === "saksi" ? legacy.peran : null,
+        role: roleFromLegacy(legacy.peran),
         frequency: (legacy.frekuensi as string | undefined) || null,
         involved: null,
       },
@@ -268,20 +257,20 @@ async function migrateArticles(): Promise<void> {
     const title = String(legacy.title ?? legacy.judul ?? "Artikel MANDU").trim();
     const summaryText = String(legacy.summary ?? legacy.ringkasan ?? body.slice(0, 200)).trim();
     const cover = (legacy.imageUrl ?? legacy.coverUrl ?? legacy.gambar) as string | undefined;
+    const link = (legacy.url ?? legacy.link) as string | undefined;
     const unknownFields = Object.keys(legacy).filter(
       (key) => !["id", "title", "judul", "body", "content", "isi", "deskripsi", "summary", "ringkasan", "imageUrl", "coverUrl", "gambar", "timestamp", "url", "link"].includes(key),
     );
     if (unknownFields.length > 0) notes.push(`Artikel ${doc.id} punya field lain: ${unknownFields.join(", ")}`);
 
-    const link = (legacy.url ?? legacy.link) as string | undefined;
     const article = {
       title,
       category: "anti_bullying",
       categoryLabel: "Anti-Perundungan",
-      type: body.length >= 30 ? "artikel" : "tautan",
+      type: articleTypeFromLegacy(body, link),
       summary: summaryText || title,
-      body: body.length >= 30 ? body : "",
-      url: body.length >= 30 ? null : (link ?? null),
+      body: articleTypeFromLegacy(body, link) === "artikel" ? body : "",
+      url: articleTypeFromLegacy(body, link) === "artikel" ? null : (link ?? null),
       coverUrl: cover ?? null,
       scholarship: null,
       featured: false,

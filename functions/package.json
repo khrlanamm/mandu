@@ -15,7 +15,10 @@
     "test:emulator": "firebase --config ../firebase.test.json emulators:exec --only auth,firestore,storage --project demo-mandu \"npm test\"",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "seed:emulator": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 GCLOUD_PROJECT=teman-ngadu tsx scripts/seed.ts"
+    "seed:emulator": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 GCLOUD_PROJECT=teman-ngadu tsx scripts/seed.ts",
+    "seed:legacy": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 GCLOUD_PROJECT=teman-ngadu tsx scripts/seed-legacy.ts",
+    "migrate:dryrun": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 GCLOUD_PROJECT=teman-ngadu tsx scripts/migrate.ts",
+    "migrate:emulator": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 GCLOUD_PROJECT=teman-ngadu tsx scripts/migrate.ts --apply"
   },
   "dependencies": {
     "firebase-admin": "^14.4.0",

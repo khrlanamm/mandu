@@ -99,7 +99,25 @@ Diuji memakai akun uji coba, bukan hanya lewat tes otomatis:
 
 ## Sedang dikerjakan
 - Melengkapi tangkapan layar manual untuk peran staf, konselor, dan superadmin, lalu merender PDF final.
-- Dashboard web: `flutterfire configure` platform web dan deploy ke Firebase Hosting `teman-ngadu.web.app`.
+- Dashboard web sudah live di **https://teman-ngadu.web.app** (hosting saja; fungsinya penuh setelah functions & rules 2.0 di-deploy pada tahap 7).
+
+### Migrasi data aplikasi 4.0.0 (siap, sudah diuji di emulator)
+Skrip `functions/scripts/migrate.ts` memindahkan laporan lama menjadi tiket, memberi field `published`
+pada artikel lama, serta menyiapkan superadmin dan admin sekolah. Aman dijalankan berulang.
+
+```bash
+cd functions
+npm run seed:legacy       # data tiruan aplikasi lama (emulator saja)
+npm run migrate:dryrun    # ringkasan tanpa menulis apa pun
+npm run migrate:emulator  # jalankan di emulator
+# Produksi (setelah dry-run cocok dan mendapat persetujuan):
+GOOGLE_APPLICATION_CREDENTIALS=~/.config/mandu/service-account.json GCLOUD_PROJECT=teman-ngadu \
+  npx tsx scripts/migrate.ts --school-code SMANDI --apply --production
+```
+
+Hasil uji di emulator: 3 laporan lama → 1 tiket menunggu verifikasi + 2 tiket selesai (identitas pelapor
+dirahasiakan, bukti lama tetap terbaca lewat path Storage), 3 artikel lama diberi `published`,
+2 superadmin dan 2 admin sekolah dibuat, pelapor lama menjadi anggota siswa aktif.
 
 ## Berikutnya
 - **Manual book PDF** penggunaan aplikasi + dashboard memakai akun uji coba.
