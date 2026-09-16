@@ -169,9 +169,10 @@ class _ArticleEditorScreenState extends ConsumerState<ArticleEditorScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SegmentedButton<ArticleType>(
+                    // Tanpa ikon: di layar sempit label "Beasiswa" terpotong menjadi dua baris.
+                    showSelectedIcon: false,
                     segments: [
-                      for (final type in ArticleType.values)
-                        ButtonSegment(value: type, label: Text(type.label), icon: Icon(type.icon)),
+                      for (final type in ArticleType.values) ButtonSegment(value: type, label: Text(type.label)),
                     ],
                     selected: {_type},
                     onSelectionChanged: _busy ? null : (selection) => setState(() => _type = selection.first),

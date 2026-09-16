@@ -74,7 +74,9 @@ class AspirationCard extends StatelessWidget {
                   const SizedBox(width: Gaps.xs),
                   Expanded(
                     child: Text(
-                      '${aspiration.type.label} · ${aspiration.topicLabel}',
+                      staffView && aspiration.number.isNotEmpty
+                          ? '${aspiration.number} · ${aspiration.type.label}'
+                          : '${aspiration.type.label} · ${aspiration.topicLabel}',
                       style: context.textStyles.labelMedium?.copyWith(color: palette.aspirasi.onContainer),
                     ),
                   ),
