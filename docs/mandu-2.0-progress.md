@@ -126,6 +126,10 @@ Hasil uji di emulator (diperiksa langsung isi Firestore-nya):
 
 Catatan: nomor tiket mengikuti tahun laporan aslinya, jadi di produksi laporan 2025 menjadi `MND-2025-xxxx`.
 
+Diverifikasi juga lewat aplikasi: masuk sebagai admin sekolah hasil migrasi (`admin-sekolah-1@example.com`),
+menyetujui kebijakan privasi (akun hasil migrasi memang diminta menyetujui saat pertama masuk), lalu tiket
+hasil migrasi tampil di tab Tugas. Artinya rantai migrasi → security rules → custom claims → aplikasi utuh.
+
 ## Berikutnya
 - **Manual book PDF** penggunaan aplikasi + dashboard memakai akun uji coba.
 - **Tahap 7 — Rilis**
