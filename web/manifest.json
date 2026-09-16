@@ -1,11 +1,11 @@
 {
-    "name": "mandu",
-    "short_name": "mandu",
+    "name": "MANDU 2.0 \u2014 Teman Mengadu, Sekolah Berbenah",
+    "short_name": "MANDU",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0E1B3D",
+    "theme_color": "#2563EB",
+    "description": "Media Aspirasi, Notifikasi, dan Dukungan Siswa: lapor, curhat, aspirasi, butuh bantuan, dan edukasi.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
