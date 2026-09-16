@@ -88,6 +88,15 @@ Sekolah demo: **SMA Negeri Demo MANDU**, kode gabung `DEMO01`.
 - Tangkapan layar: `docs/manual/img/` (diambil dari emulator Android memakai akun uji coba).
 - Buat PDF: `docs/manual/render.sh` → `docs/manual/manual-mandu.pdf`.
 
+### Verifikasi langsung di emulator Android
+Diuji memakai akun uji coba, bukan hanya lewat tes otomatis:
+- Siswa: masuk, beranda 5 layanan, **kirim laporan baru sampai terbit nomor `MND-2026-0007`**, Aktivitas, detail laporan selesai + penilaian, Curhat (kirim pesan), Butuh Bantuan, Aspirasi, Edukasi, notifikasi.
+- Tim Verifikasi/admin: tab Tugas, detail laporan, **verifikasi & teruskan laporan darurat**, persetujuan siswa, kotak aspirasi + **tanggapan resmi tersimpan**, konten Edukasi sekolah, dashboard.
+- Konselor: ruang konselor (antrean bantuan + percakapan curhat).
+- Superadmin: daftar sekolah dan dashboard platform.
+- Tamu: aspirasi tanpa login lewat kode sekolah.
+- Keluar akun diuji ulang pada setiap peran setelah perbaikan dependensi melingkar.
+
 ## Sedang dikerjakan
 - Melengkapi tangkapan layar manual untuk peran staf, konselor, dan superadmin, lalu merender PDF final.
 - Dashboard web: `flutterfire configure` platform web dan deploy ke Firebase Hosting `teman-ngadu.web.app`.
