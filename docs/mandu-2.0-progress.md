@@ -143,12 +143,17 @@ Sudah dikerjakan:
   `[disimpan di Play Console > App access]`, plus dua superadmin. Akun `siswa@smandemo.sch.id` disiapkan untuk peninjau Play Console
   (lihat `docs/play-console-review.md`).
 
-Menunggu/berikutnya:
-- Index komposit Firestore sedang dibangun; contoh data (laporan, aspirasi, curhat, Edukasi) diisi ulang
-  dengan `npx tsx scripts/seed.ts --production --password ... --superadmin ...` setelah index READY.
-- Deploy Cloud Functions ke produksi.
-- Uji aplikasi rilis terhadap produksi, lalu render ulang manual PDF.
-- Build AAB dan unggah ke Play Console (dikerjakan setelah pengujian, sesuai permintaan user).
+- **Cloud Functions** seluruhnya ter-deploy (termasuk trigger pesan Curhat dan pengingat SLA terjadwal).
+- **Metode masuk** Email/Kata Sandi dan Masuk anonim diaktifkan (sebelumnya hanya Google).
+- **Contoh data produksi:** 6 laporan, 4 aspirasi (satu dari tamu), 3 permintaan bantuan & curhat, 4 konten Edukasi.
+- **Verifikasi produksi:**
+  - lewat HTTPS: masuk sebagai `siswa@smandemo.sch.id` → `account-sync` mengembalikan
+    "Budi Santoso · SMA Negeri Demo MANDU · siswa · aktif"; `schools-lookup` dan aspirasi tamu berhasil (ASP-2026-0004);
+  - lewat aplikasi rilis di emulator Android: masuk, beranda, dan daftar laporan tampil dari data produksi.
+
+Berikutnya:
+- Build AAB versionName 4.0.0 dan unggah ke Play Console (dikerjakan sesuai aba-aba user).
+- Aktifkan App Check setelah rilis pertama stabil.
 
 ## Berikutnya
 - **Manual book PDF** penggunaan aplikasi + dashboard memakai akun uji coba.
