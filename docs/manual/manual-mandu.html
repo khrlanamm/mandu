@@ -163,24 +163,39 @@
 
 <section class="page">
   <h2>3. Akun uji coba</h2>
-  <p class="lead">Akun berikut dibuat oleh skrip <code>npm run seed:emulator</code> pada sekolah demo
-  <b>SMA Negeri Demo MANDU</b> (kode gabung <code>DEMO01</code>). Semua memakai kata sandi <code>mandu123</code>.</p>
+  <p class="lead">MANDU 2.0 dipakai bersama oleh banyak sekolah. Untuk mencoba tanpa mengganggu data sekolah
+  sungguhan, tersedia <b>SMA Negeri Demo MANDU</b> dengan kode gabung <code>DEMO01</code>.</p>
+
+  <h3>Akun di aplikasi produksi</h3>
+  <p>Aplikasi Android dan dashboard web <a href="https://teman-ngadu.web.app">teman-ngadu.web.app</a> memakai
+  akun berikut. Semua memakai kata sandi <code>[disimpan di Play Console > App access]</code> dan masuk lewat menu
+  <b>“Staf sekolah? Masuk dengan email”</b>.</p>
   <table>
-    <tr><th style="width:28%">Peran</th><th>Akun</th><th style="width:34%">Dipakai untuk mencoba</th></tr>
-    <tr><td>Superadmin</td><td><code>superadmin@mandu.test</code></td><td>Kelola sekolah, Edukasi global, dashboard platform</td></tr>
-    <tr><td>Admin Sekolah (Tim Verifikasi)</td><td><code>admin@smandemo.sch.id</code></td><td>Verifikasi laporan, anggota, dashboard, aspirasi</td></tr>
+    <tr><th style="width:30%">Peran</th><th>Akun</th><th style="width:32%">Dipakai untuk mencoba</th></tr>
+    <tr><td>Admin Sekolah (Tim Verifikasi)</td><td><code>admin@smandemo.sch.id</code></td><td>Verifikasi laporan, anggota, aspirasi, dashboard</td></tr>
     <tr><td>Pimpinan</td><td><code>kepsek@smandemo.sch.id</code></td><td>Mode pantau: dashboard dan daftar laporan</td></tr>
     <tr><td>Guru BK (Tim Verifikasi)</td><td><code>bk@smandemo.sch.id</code></td><td>Curhat, Butuh Bantuan, laporan keamanan</td></tr>
     <tr><td>Petugas Sarpras</td><td><code>sarpras@smandemo.sch.id</code></td><td>Menangani laporan fasilitas &amp; kebersihan</td></tr>
     <tr><td>Petugas Kurikulum</td><td><code>kurikulum@smandemo.sch.id</code></td><td>Menangani laporan pembelajaran</td></tr>
-    <tr><td>Siswa</td><td><code>siswa@smandemo.sch.id</code> (Budi Santoso)</td><td>Semua layanan siswa</td></tr>
+    <tr><td><b>Siswa</b></td><td><code>siswa@smandemo.sch.id</code> (Budi Santoso)</td><td>Semua layanan siswa — akun ini juga dipakai peninjau Google Play</td></tr>
     <tr><td>Siswa kedua</td><td><code>siswa2@smandemo.sch.id</code> (Siti Aminah)</td><td>Dukungan aspirasi, laporan anonim</td></tr>
-    <tr><td>Calon siswa</td><td><code>calon.siswa@mandu.test</code></td><td>Menunggu persetujuan admin</td></tr>
-    <tr><td>Akun NISN</td><td>kode <code>DEMO01</code> · NISN <code>0059990001</code></td><td>Masuk tanpa Google, wajib ganti kata sandi</td></tr>
-    <tr><td>Admin sekolah kedua</td><td><code>admin@smpharapan.sch.id</code></td><td>Membuktikan data antar sekolah terpisah</td></tr>
+    <tr><td>Calon siswa</td><td><code>calon.siswa@smandemo.sch.id</code></td><td>Menunggu persetujuan admin</td></tr>
+    <tr><td>Siswa akun NISN</td><td>kode <code>DEMO01</code> · NISN <code>0059990001</code></td><td>Masuk tanpa Google; wajib ganti kata sandi saat pertama masuk</td></tr>
+    <tr><td>Superadmin</td><td>akun Google pengelola MANDU</td><td>Kelola sekolah, Edukasi global, dashboard platform</td></tr>
   </table>
-  <div class="tip"><b>Data contoh yang ikut dibuat:</b> 6 laporan (dari menunggu verifikasi sampai selesai dan dinilai),
-  3 aspirasi, 2 permintaan bantuan, 1 percakapan curhat, dan 4 konten Edukasi.</div>
+  <div class="warn"><b>Kata sandi demo bersifat publik.</b> Akun di atas hanya untuk mencoba aplikasi.
+  Jangan mengisi data pribadi yang sesungguhnya, dan ganti kata sandinya bila sekolah demo ini dipakai
+  untuk keperluan lain.</div>
+
+  <h3>Data contoh yang sudah tersedia</h3>
+  <p>Agar setiap layanan bisa langsung dicoba, sekolah demo berisi: 6 laporan (dari menunggu verifikasi
+  sampai selesai dan dinilai), 3 aspirasi (termasuk satu dari tamu tanpa login), 2 permintaan Butuh Bantuan,
+  1 percakapan Curhat, dan 4 konten Edukasi.</p>
+
+  <h3>Untuk pengembang: akun di Firebase Emulator Suite</h3>
+  <p>Saat menjalankan aplikasi dengan Emulator Suite (<code>npm run seed:emulator</code>), akun yang sama
+  tersedia dengan kata sandi <code>mandu123</code>, ditambah <code>superadmin@mandu.test</code> dan sekolah
+  kedua <b>SMP Harapan Bangsa</b> (kode <code>HARAPAN</code>) untuk menguji pemisahan data antar sekolah.</p>
 </section>
 
 <section class="page">

@@ -130,6 +130,26 @@ Diverifikasi juga lewat aplikasi: masuk sebagai admin sekolah hasil migrasi (`ad
 menyetujui kebijakan privasi (akun hasil migrasi memang diminta menyetujui saat pertama masuk), lalu tiket
 hasil migrasi tampil di tab Tugas. Artinya rantai migrasi → security rules → custom claims → aplikasi utuh.
 
+### Tahap 7 — Produksi (sedang berjalan)
+Keputusan user (16 Sep 2026): data aplikasi 4.0.0 hanyalah percobaan satu sekolah, **bukan data asli**,
+sehingga tidak dimigrasikan melainkan dihapus. Produksi diisi sekolah demo yang dipakai manual penggunaan.
+
+Sudah dikerjakan:
+- **Pembersihan produksi** (`functions/scripts/cleanup-legacy.ts`, dry-run lalu `--apply`):
+  44 laporan, 4 admin lama, 50 artikel lama, 21 berkas Storage, dan 195 akun Auth dihapus.
+  Dua akun dipertahankan (`anam160404@`, `benevology@`) untuk dijadikan superadmin.
+- **Deploy produksi:** Firestore rules, indexes, dan Storage rules sudah live.
+- **Sekolah demo di produksi:** SMA Negeri Demo MANDU (kode `DEMO01`), 9 akun demo dengan kata sandi
+  `[disimpan di Play Console > App access]`, plus dua superadmin. Akun `siswa@smandemo.sch.id` disiapkan untuk peninjau Play Console
+  (lihat `docs/play-console-review.md`).
+
+Menunggu/berikutnya:
+- Index komposit Firestore sedang dibangun; contoh data (laporan, aspirasi, curhat, Edukasi) diisi ulang
+  dengan `npx tsx scripts/seed.ts --production --password ... --superadmin ...` setelah index READY.
+- Deploy Cloud Functions ke produksi.
+- Uji aplikasi rilis terhadap produksi, lalu render ulang manual PDF.
+- Build AAB dan unggah ke Play Console (dikerjakan setelah pengujian, sesuai permintaan user).
+
 ## Berikutnya
 - **Manual book PDF** penggunaan aplikasi + dashboard memakai akun uji coba.
 - **Tahap 7 — Rilis**

@@ -70,10 +70,11 @@ class _EmailLoginScreenState extends ConsumerState<EmailLoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('Akun staf sekolah', style: context.textStyles.headlineSmall),
+                    Text('Masuk dengan email', style: context.textStyles.headlineSmall),
                     const SizedBox(height: Gaps.sm),
                     Text(
-                      'Untuk guru dan staf yang dibuatkan akun oleh admin sekolah. Punya akun Google? Kembali dan pilih "Masuk dengan Google".',
+                      'Untuk guru, staf, dan siswa yang dibuatkan akun email oleh sekolah. '
+                      'Punya akun Google? Kembali dan pilih "Masuk dengan Google".',
                       style: context.textStyles.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                     ),
                     const SizedBox(height: Gaps.xl),

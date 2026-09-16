@@ -5,9 +5,10 @@
  *   firebase emulators:start --project teman-ngadu      # terminal lain, dari root repo
  *   npm run seed:emulator                                 # dari folder functions
  *
- * Produksi (hanya "Sekolah Uji Coba MANDU", tanpa superadmin demo):
+ * Produksi (sekolah demo yang sama dengan manual penggunaan, password kuat wajib):
  *   GOOGLE_APPLICATION_CREDENTIALS=~/.config/mandu/service-account.json GCLOUD_PROJECT=teman-ngadu \
- *     npx tsx scripts/seed.ts --production --password '<password-kuat-min-12>'
+ *     npx tsx scripts/seed.ts --production --password '<password-kuat-min-12>' \
+ *       --superadmin email1@gmail.com,email2@gmail.com
  */
 import type {UserRecord} from "firebase-admin/auth";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
@@ -34,6 +35,11 @@ const args = process.argv.slice(2);
 const production = args.includes("--production");
 const passwordIndex = args.indexOf("--password");
 const password = production ? args[passwordIndex + 1] : "mandu123";
+const superadminIndex = args.indexOf("--superadmin");
+/** Akun yang dijadikan superadmin produksi (dipisah koma). Dilewati bila akunnya belum pernah masuk. */
+const superadminEmails = superadminIndex >= 0 && args[superadminIndex + 1] ?
+  args[superadminIndex + 1].split(",").map((email) => email.trim()).filter(Boolean) :
+  [];
 
 function assertSafeTarget(): void {
   const emulatorHosts = [process.env.FIRESTORE_EMULATOR_HOST, process.env.FIREBASE_AUTH_EMULATOR_HOST];
@@ -397,16 +403,29 @@ async function ensureSampleArticles(schoolId: string, domain: string): Promise<n
 async function main(): Promise<void> {
   assertSafeTarget();
 
-  if (!production) {
+  if (production) {
+    for (const email of superadminEmails) {
+      const record = await auth().getUserByEmail(email).catch(() => null);
+      if (!record) {
+        console.warn(`Lewati superadmin ${email}: akunnya belum ada. Minta pemiliknya masuk sekali, lalu jalankan ulang skrip.`);
+        continue;
+      }
+      await ensureUserDoc(record);
+      await db().collection("users").doc(record.uid).update({isSuperadmin: true});
+      await syncClaims(record.uid);
+      summary.push({sekolah: "(semua sekolah)", peran: "superadmin", login: email});
+    }
+  } else {
     const superadmin = await ensureAccount("superadmin@mandu.test", "Superadmin MANDU", true);
     await db().collection("users").doc(superadmin.uid).update({isSuperadmin: true});
     await syncClaims(superadmin.uid);
     summary.push({sekolah: "(semua sekolah)", peran: "superadmin", login: "superadmin@mandu.test"});
   }
 
-  const domain = production ? "ujicoba.mandu.test" : "smandemo.sch.id";
-  const code = production ? "UJICOBA" : "DEMO01";
-  const name = production ? "Sekolah Uji Coba MANDU" : "SMA Negeri Demo MANDU";
+  // Sekolah demo yang sama dipakai di emulator dan produksi agar cocok dengan manual penggunaan.
+  const domain = "smandemo.sch.id";
+  const code = "DEMO01";
+  const name = "SMA Negeri Demo MANDU";
   const school = {id: await ensureSchool({name, level: "SMA", city: "Lamongan", province: "Jawa Timur", code}), name, code};
 
   await ensureStaff(school, `admin@${domain}`, "Andi Wijaya", "admin", [], true);
@@ -416,7 +435,7 @@ async function main(): Promise<void> {
   await ensureStaff(school, `kurikulum@${domain}`, "Ratna Dewi, M.Pd.", "petugas", ["kurikulum"], true);
   await ensureStudent(school, `siswa@${domain}`, "Budi Santoso", "XI IPA 1", {nisn: "0051111111", approve: true, consent: true});
   await ensureStudent(school, `siswa2@${domain}`, "Siti Aminah", "X-2", {nisn: "0052222222", approve: true, consent: true});
-  await ensureStudent(school, production ? `calon@${domain}` : "calon.siswa@mandu.test", "Rina Pratiwi", "X-1", {approve: false, consent: false});
+  await ensureStudent(school, `calon.siswa@${domain}`, "Rina Pratiwi", "X-1", {approve: false, consent: false});
   await ensureNisnStudent(school, "0059990001", "Dewi Lestari", "X-2");
   const sampleTickets = await ensureSampleTickets(school.id, domain);
   const sampleAspirations = await ensureSampleAspirations(school.id, code, domain);
