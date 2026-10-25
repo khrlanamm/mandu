@@ -93,3 +93,7 @@ cd functions && npm run test:emulator   # functions and security rules
 3. Run `flutter build appbundle --release` and upload `build/app/outputs/bundle/release/app-release.aab`.
 
 Play App Signing is on, and its key's SHA is registered in Firebase.
+
+## License
+
+All rights reserved. The source code is public for reference only. See [LICENSE](LICENSE).
