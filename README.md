@@ -1,10 +1,43 @@
 # MANDU (Teman Ngadu)
 
+[![CI](https://github.com/khrlanamm/mandu/actions/workflows/ci.yml/badge.svg)](https://github.com/khrlanamm/mandu/actions/workflows/ci.yml)
+
 ![MANDU feature graphic](https://raw.githubusercontent.com/khrlanamm/khrlanamm/main/assets/projects/mandu.webp)
 
 School reporting and student support app, first built for SMA Negeri 1 Sukodadi and published by Komunitas Kertas Kosong. MANDU 2.0 serves many schools from one app. Each school joins with its own code, and its data stays separate from other schools.
 
 [Google Play](https://play.google.com/store/apps/details?id=com.khrlanamm.mandu) | [Web dashboard](https://teman-ngadu.web.app)
+
+## Screenshots
+
+| Home | Report | Activity | School dashboard |
+|---|---|---|---|
+| <img src="docs/images/home.webp" alt="Student home with the five school services" width="200"> | <img src="docs/images/report.webp" alt="Report form with problem categories" width="200"> | <img src="docs/images/activity.webp" alt="Report list with status for each step" width="200"> | <img src="docs/images/dashboard.webp" alt="School dashboard with report counts and monthly trend" width="200"> |
+
+## Architecture
+
+```mermaid
+flowchart LR
+  app["Flutter app<br>students, staff, admins"]
+  guest["Guest page<br>/s/{code}/aspirasi"]
+  subgraph Firebase
+    auth["Authentication<br>claims: sid, role, units"]
+    fn["Callable functions<br>tickets, aspirations, care, members, stats"]
+    fs[("Firestore<br>data split per school")]
+    st[("Storage<br>report evidence")]
+    sla["slaReminders<br>every 60 minutes"]
+    fcm[Cloud Messaging]
+  end
+  app -->|Google, NISN, or staff email| auth
+  app -->|reports, aspirations, help, members| fn
+  guest -->|submitPublic| fn
+  app -->|reads and chat messages, checked by rules| fs
+  app -->|photo or PDF| st
+  fn --> fs
+  fn --> fcm
+  sla --> fcm
+  fcm --> app
+```
 
 ## Features
 
