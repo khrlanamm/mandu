@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main, mandu-2.0]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Flutter analyze and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.4
+          cache: true
+      # lib/firebase_options.dart is not in the repository. Analyze and test
+      # only need the class to exist, so CI writes one with placeholder values.
+      - name: Placeholder Firebase options
+        run: |
+          cat > lib/firebase_options.dart <<'EOF'
+          // ignore_for_file: type=lint
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+          import 'package:flutter/foundation.dart' show kIsWeb;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform => kIsWeb ? web : android;
+
+            static const FirebaseOptions android = FirebaseOptions(
+              apiKey: 'ci-placeholder',
+              appId: '1:000000000000:android:0000000000000000',
+              messagingSenderId: '000000000000',
+              projectId: 'demo-mandu',
+            );
+            static const FirebaseOptions web = FirebaseOptions(
+              apiKey: 'ci-placeholder',
+              appId: '1:000000000000:web:0000000000000000',
+              messagingSenderId: '000000000000',
+              projectId: 'demo-mandu',
+            );
+          }
+          EOF
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  functions:
+    name: Functions and security rules
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run lint
+      # Same as `npm run test:emulator`, with a pinned firebase-tools.
+      - name: Unit and security rules tests
+        run: npx --yes firebase-tools@15 --config ../firebase.test.json emulators:exec --only auth,firestore,storage --project demo-mandu "npm test"

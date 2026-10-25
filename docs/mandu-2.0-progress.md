@@ -1,7 +1,7 @@
 # MANDU 2.0 — Catatan Progres & Serah Terima
 
 - Rencana lengkap yang disetujui: `/Users/benevology/.claude/plans/snuggly-gathering-gosling.md`
-- Branch kerja: `mandu-2.0` (sudah di-push ke `github.com/khrlanamm/mandu`). Jangan bekerja di `master`.
+- Branch kerja: `mandu-2.0` (sudah di-push ke `github.com/khrlanamm/mandu`). Jangan bekerja langsung di `main`; `main` di-fast-forward dari `mandu-2.0`.
 - Daftar bug yang ditemukan dan diperbaiki: `docs/bug-temuan.md`.
 
 ## Cara menjalankan (lokal)
