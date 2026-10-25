@@ -17,7 +17,7 @@ School reporting and student support app, first built for SMA Negeri 1 Sukodadi 
 ## Architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
   app["Flutter app<br>students, staff, admins"]
   guest["Guest page<br>/s/{code}/aspirasi"]
   subgraph Firebase
@@ -26,7 +26,7 @@ flowchart LR
     fs[("Firestore<br>data split per school")]
     st[("Storage<br>report evidence")]
     sla["slaReminders<br>every 60 minutes"]
-    fcm[Cloud Messaging]
+    fcm["Cloud Messaging<br>push to phones"]
   end
   app -->|Google, NISN, or staff email| auth
   app -->|reports, aspirations, help, members| fn
@@ -36,7 +36,6 @@ flowchart LR
   fn --> fs
   fn --> fcm
   sla --> fcm
-  fcm --> app
 ```
 
 ## Features
